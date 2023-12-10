@@ -7,7 +7,7 @@ import Category from "../models/CategoryModel.js";
 import getDataUri from "../utils/dataUri.js";
 
 export const createProduct = async (req, res) => {
-  const { productName, price, productDescription, rating, categories } =
+  const { productName, price, productDescription, stock, categories } =
     req.body;
 
   // console.log("Request Body:", req.body);
@@ -17,7 +17,8 @@ export const createProduct = async (req, res) => {
     !productName ||
     !price ||
     !productDescription ||
-    !rating ||
+    !stock ||
+    !categories ||
     categories.length === 0
   ) {
     return res.status(400).json({
@@ -73,7 +74,7 @@ export const createProduct = async (req, res) => {
         public_id: mycloud.public_id,
         url: mycloud.secure_url,
       },
-      rating,
+      stock,
       categories: resolvedCategories.map((cat) => cat._id),
       sellerId: seller._id,
     });

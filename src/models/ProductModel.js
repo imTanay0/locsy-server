@@ -30,14 +30,14 @@ const productSchema = mongoose.Schema(
     rating: {
       type: Number,
     },
-    category: [
-      {
-        categoryId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Category",
-        },
-      },
-    ],
+    // category: [
+    //   {
+    //     categoryId: {
+    //       type: mongoose.Schema.Types.ObjectId,
+    //       ref: "Category",
+    //     },
+    //   },
+    // ],
     categories: [String],
     stock: {
       type: Number,
