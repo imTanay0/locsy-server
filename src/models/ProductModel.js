@@ -15,6 +15,10 @@ const productSchema = mongoose.Schema(
       required: true,
       default: 0,
     },
+    offerPrice: {
+      type: Number,
+      default: 0,
+    },
     productImage: {
       public_id: {
         type: String,
