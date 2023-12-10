@@ -29,34 +29,4 @@ const sellerSchema = mongoose.Schema(
   { timestamps: true }
 );
 
-// // Hash Password before saving
-// sellerSchema.pre("save", async function (next) {
-//   if (this.isModified("password")) {
-//     try {
-//       const hashedPassword = await bcrypt.hash(this.password, 10);
-//       this.password = hashedPassword;
-//     } catch (error) {
-//       next(error);
-//       console.log(`Error: ${error}`);
-//     }
-//   }
-//   next();
-// });
-
-// // Generate JWT Token
-// sellerSchema.methods.getJWTToken = function () {
-//   return jwt.sign({ _id: this._id }, process.env.JWT_SECRET, {
-//     expiresIn: "15d",
-//   });
-// };
-
-// // Compare password
-// sellerSchema.methods.comparePassword = async function (password) {
-//   try {
-//     return await bcrypt.compare(password, this.password);
-//   } catch (error) {
-//     throw error;
-//   }
-// };
-
 export default mongoose.model("Seller", sellerSchema);

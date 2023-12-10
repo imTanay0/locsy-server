@@ -161,3 +161,40 @@ export const logoutSeller = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+export const getSeller = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    if (user.role !== 2) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
+    const seller = await Seller.findOne({ userId: user._id });
+
+    if (!seller) {
+      return res.status(404).json({
+        success: false,
+        message: "Seller not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      user,
+      seller,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};

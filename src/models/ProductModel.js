@@ -16,7 +16,12 @@ const productSchema = mongoose.Schema(
       default: 0,
     },
     productImage: {
-      type: String,
+      public_id: {
+        type: String,
+      },
+      url: {
+        type: String,
+      },
     },
     sellerId: {
       type: mongoose.Schema.Types.ObjectId,
