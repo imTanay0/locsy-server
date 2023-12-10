@@ -1,20 +1,14 @@
-import express from "express";
-import cors from "cors";
 import cookieParser from "cookie-parser";
-import morgan from "morgan";
+import cors from "cors";
+import express from "express";
 import helmet from "helmet";
-import cloudinary from "cloudinary";
+import morgan from "morgan";
 
-import userRoutes from "./routes/userRoutes.js";
 import sellerRoutes from "./routes/sellerRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 
 // CONFIG
 const app = express();
-cloudinary.v2.config({
-  cloud_name: process.env.CLOUDINARY_CLIENT_NAME,
-  api_key: process.env.CLOUDINARY_CLIENT_API,
-  api_secret: process.env.CLOUDINARY_CLIENT_SECRET,
-});
 
 // MIDDLEWARES
 app.use(
@@ -24,8 +18,8 @@ app.use(
   })
 );
 
-app.use(express.json({ limit: "16kb" }));
-app.use(express.urlencoded({ extended: true, limit: "16kb" }));
+app.use(express.json({ limit: "20mb" }));
+app.use(express.urlencoded({ extended: true, limit: "20mb" }));
 // app.use(express.static("public"));
 app.use(cookieParser());
 app.use(morgan("common"));
@@ -39,3 +33,4 @@ app.use("/api/v1/seller", sellerRoutes);
 app.get("/", (req, res) => res.send(`Hello Admin`));
 
 export { app };
+

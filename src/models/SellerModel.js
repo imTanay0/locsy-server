@@ -14,9 +14,12 @@ const sellerSchema = mongoose.Schema(
       required: true,
     },
     shopImage: {
-      type: String,
-      // required: true,
-      default: "",
+      public_id: {
+        type: String,
+      },
+      url: {
+        type: String,
+      },
     },
     shopDescription: {
       type: String,

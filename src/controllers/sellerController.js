@@ -1,7 +1,9 @@
+import cloudinary from "cloudinary";
+
 import Seller from "../models/SellerModel.js";
 import User from "../models/UserModel.js";
 import sendToken from "../utils/sendToken.js";
-import getDataUri from './../utils/dataUri.js';
+import getDataUri from "./../utils/dataUri.js";
 
 export const registerSeller = async (req, res) => {
   const {
@@ -10,23 +12,35 @@ export const registerSeller = async (req, res) => {
     email,
     password,
     contactNo,
-    address,
+    street,
+    city,
+    state,
+    zipCode,
     shopName,
-    shopImage,
     shopDescription,
   } = req.body;
 
-  if (!fname || !lname || !email || !password || !contactNo) {
+  if (
+    !fname ||
+    !lname ||
+    !email ||
+    !password ||
+    !contactNo ||
+    !street ||
+    !city ||
+    !state ||
+    !zipCode
+  ) {
     return res.status(400).json({
       success: false,
-      message: "Please fill all the fields",
+      message: "Please fill in all the required fields",
     });
   }
 
   if (!shopName || !shopDescription) {
     return res.status(400).json({
       success: false,
-      message: "Please fill all the related to seller information",
+      message: "Please fill in all the seller related information",
     });
   }
 
@@ -38,6 +52,12 @@ export const registerSeller = async (req, res) => {
         .status(409)
         .json({ success: false, message: "User already exists" });
     }
+
+    // Construct address object if address fields are provided
+    const address =
+      street && city && state && zipCode
+        ? { street, city, state, zipCode }
+        : undefined;
 
     // Upload file on Cloudinary
     const file = req.file;
@@ -59,27 +79,32 @@ export const registerSeller = async (req, res) => {
     const seller = await Seller.create({
       userId: user._id,
       shopName,
-      shopImage,
+      shopImage: {
+        public_id: mycloud.public_id,
+        url: mycloud.secure_url,
+      },
       shopDescription,
     });
 
-    sendToken(res, user, seller, "Registerd Successfully", 201);
+    sendToken(res, user, seller, "Registered Successfully", 201);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
 
 export const loginSeller = async (req, res) => {
+  const { email, password } = req.body;
+
+  console.log(email, password);
+
+  if (!email || !password) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Enter all required login fields" });
+  }
+
   try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Enter all fields" });
-    }
-
     const user = await User.findOne({ email }).select("+password");
 
     if (!user) {
