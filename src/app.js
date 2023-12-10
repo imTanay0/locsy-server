@@ -3,12 +3,16 @@ import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import morgan from "morgan";
+import bodyParser from "body-parser";
+import multer from "multer";
 
-import sellerRoutes from "./routes/sellerRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import sellerRoutes from "./routes/sellerRoutes.js";
+import productRoutes from "./routes/productRoutes.js";
 
 // CONFIG
 const app = express();
+const upload = multer();
 
 // MIDDLEWARES
 app.use(
@@ -18,9 +22,12 @@ app.use(
   })
 );
 
+// app.use(upload.single());
 app.use(express.json({ limit: "20mb" }));
 app.use(express.urlencoded({ extended: true, limit: "20mb" }));
-// app.use(express.static("public"));
+app.use(bodyParser.json({ limit: "20mb", extended: true }));
+app.use(bodyParser.urlencoded({ limit: "20mb", extended: true }));
+app.use(express.static("public"));
 app.use(cookieParser());
 app.use(morgan("common"));
 app.use(helmet());
@@ -29,8 +36,8 @@ app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 // ROUTES
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/seller", sellerRoutes);
+app.use("/api/v1/product", productRoutes);
 
 app.get("/", (req, res) => res.send(`Hello Admin`));
 
 export { app };
-
