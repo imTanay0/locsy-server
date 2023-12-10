@@ -9,6 +9,7 @@ import multer from "multer";
 import userRoutes from "./routes/userRoutes.js";
 import sellerRoutes from "./routes/sellerRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
+import buyerRoutes from "./routes/buyerRoutes.js";
 
 // CONFIG
 const app = express();
@@ -37,6 +38,7 @@ app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/seller", sellerRoutes);
 app.use("/api/v1/product", productRoutes);
+app.use("/api/v1/buyer", buyerRoutes);
 
 app.get("/", (req, res) => res.send(`Hello Admin`));
 

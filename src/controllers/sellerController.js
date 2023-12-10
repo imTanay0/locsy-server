@@ -86,7 +86,13 @@ export const registerSeller = async (req, res) => {
       shopDescription,
     });
 
-    sendToken(res, user, seller, `${user.fname} ${user.lname} Registered Successfully`, 201);
+    sendToken(
+      res,
+      user,
+      seller,
+      `${user.fname} ${user.lname} Registered Successfully`,
+      201
+    );
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
@@ -108,9 +114,10 @@ export const loginSeller = async (req, res) => {
     const user = await User.findOne({ email }).select("+password");
 
     if (!user) {
-      return res
-        .status(401)
-        .json({ success: false, message: "Incorrect email or password" });
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password",
+      });
     }
 
     const isMatch = await user.comparePassword(password);
