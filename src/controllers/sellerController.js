@@ -86,7 +86,7 @@ export const registerSeller = async (req, res) => {
       shopDescription,
     });
 
-    sendToken(res, user, seller, "Registered Successfully", 201);
+    sendToken(res, user, seller, `${user.fname} ${user.lname} Registered Successfully`, 201);
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
@@ -138,7 +138,13 @@ export const loginSeller = async (req, res) => {
       });
     }
 
-    sendToken(res, user, seller, `Welcome back ${user.fname}`, 201);
+    sendToken(
+      res,
+      user,
+      seller,
+      `Welcome back ${user.fname} ${user.lname}`,
+      201
+    );
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

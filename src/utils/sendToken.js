@@ -18,6 +18,9 @@ const sendToken = (res, user, role, message, statusCode = 200) => {
 
 export default sendToken;
 
+
+
+
 // const sendTokenSeller = (res, user, seller, message, statusCode = 200) => {
 //   const token = seller.getJWTToken();
 //   const options = {
