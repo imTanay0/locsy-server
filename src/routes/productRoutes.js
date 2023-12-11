@@ -5,6 +5,7 @@ import {
   getSllerProducts,
   getAllProducts,
   searchProducts,
+  getProductByCategory,
 } from "../controllers/productController.js";
 import { isAuthenticated } from "../middlewares/auth.js";
 import singleUpload from "../middlewares/multer.js";
@@ -18,5 +19,7 @@ router.get("/get", isAuthenticated, getSllerProducts);
 router.get("/getall", getAllProducts);
 
 router.get("/search", searchProducts);
+
+router.get("/search/:category", getProductByCategory);
 
 export default router;

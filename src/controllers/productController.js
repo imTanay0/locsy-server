@@ -221,7 +221,7 @@ export const searchProducts = async (req, res) => {
 
     // Search for categories
     const categoryResults = await Category.find({
-      category: { $regex: new RegExp(query, 'i') },
+      category: { $regex: new RegExp(query, "i") },
     });
 
     // Extract category IDs from results
@@ -230,7 +230,7 @@ export const searchProducts = async (req, res) => {
     // Search for products by product name or related to the found categories
     const productResults = await Product.find({
       $or: [
-        { productName: { $regex: new RegExp(query, 'i') } },
+        { productName: { $regex: new RegExp(query, "i") } },
         { categories: { $in: categoryIds } },
       ],
     });
@@ -239,6 +239,51 @@ export const searchProducts = async (req, res) => {
       success: true,
       productResults,
       categoryResults,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const getProductByCategory = async (req, res) => {
+  try {
+    const { category } = req.params;
+
+    const categoryResults = await Category.findOne({
+      category: { $regex: new RegExp(category, "i") },
+    });
+
+    if (!categoryResults) {
+      return res.status(404).json({
+        success: false,
+        message: "Category not found",
+      });
+    }
+
+    console.log(categoryResults);
+
+    let categoryIds;
+
+    if (Array.isArray(categoryResults)) {
+      categoryIds = categoryResults.map((cat) => cat._id);
+    } else {
+      categoryIds = categoryResults._id;
+    }
+
+    const productResults = await Product.find({
+      categories: { $in: categoryIds },
+    });
+
+    if (!productResults || productResults.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No products found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      productResults,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
