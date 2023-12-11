@@ -224,6 +224,13 @@ export const searchProducts = async (req, res) => {
       category: { $regex: new RegExp(query, "i") },
     });
 
+    if (!categoryResults || categoryResults.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Category not found",
+      });
+    }
+
     // Extract category IDs from results
     const categoryIds = categoryResults.map((category) => category._id);
 
@@ -253,7 +260,7 @@ export const getProductByCategory = async (req, res) => {
       category: { $regex: new RegExp(category, "i") },
     });
 
-    if (!categoryResults) {
+    if (!categoryResults || categoryResults.length === 0) {
       return res.status(404).json({
         success: false,
         message: "Category not found",
