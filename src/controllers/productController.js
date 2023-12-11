@@ -267,7 +267,7 @@ export const getProductByCategory = async (req, res) => {
       });
     }
 
-    console.log(categoryResults);
+    // console.log(categoryResults);
 
     let categoryIds;
 
