@@ -214,3 +214,33 @@ export const getAllProducts = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+export const searchProducts = async (req, res) => {
+  try {
+    const { query } = req.query;
+
+    // Search for categories
+    const categoryResults = await Category.find({
+      category: { $regex: new RegExp(query, 'i') },
+    });
+
+    // Extract category IDs from results
+    const categoryIds = categoryResults.map((category) => category._id);
+
+    // Search for products by product name or related to the found categories
+    const productResults = await Product.find({
+      $or: [
+        { productName: { $regex: new RegExp(query, 'i') } },
+        { categories: { $in: categoryIds } },
+      ],
+    });
+
+    res.status(200).json({
+      success: true,
+      productResults,
+      categoryResults,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
