@@ -22,6 +22,10 @@ const sellerSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    subscription: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Subscription",
+    }
   },
   { timestamps: true }
 );
