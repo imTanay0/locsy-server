@@ -48,6 +48,10 @@ const userSchema = mongoose.Schema(
         default: "India",
       },
     },
+    addressId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Address",
+    },
     role: {
       type: Number,
       enum: [1, 2, 3], // 1 -> Admin, 2 -> Seller, 3 -> Buyer
