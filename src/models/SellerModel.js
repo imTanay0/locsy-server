@@ -25,7 +25,18 @@ const sellerSchema = mongoose.Schema(
     subscription: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Subscription",
-    }
+    },
+    isApproved: {
+      type: Boolean,
+      default: false,
+    },
+    approvalDetails: {
+      reason: String,
+      adminUserId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    },
   },
   { timestamps: true }
 );
