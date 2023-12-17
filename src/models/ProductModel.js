@@ -15,18 +15,33 @@ const productSchema = new mongoose.Schema(
       required: true,
       default: 0,
     },
-    offerPrice: {
+    discount: {
       type: Number,
       default: 0,
     },
-    productImage: {
-      public_id: {
-        type: String,
+    mainImage: {
+      image: {
+        public_id: {
+          type: String,
+        },
+        url: {
+          type: String,
+        },
       },
-      url: {
-        type: String,
-      },
+      required: true,
     },
+    subImages: [
+      {
+        subImage: {
+          public_id: {
+            type: String,
+          },
+          url: {
+            type: String,
+          },
+        },
+      },
+    ],
     sellerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Seller",
@@ -34,15 +49,14 @@ const productSchema = new mongoose.Schema(
     rating: {
       type: Number,
     },
-    // category: [
-    //   {
-    //     categoryId: {
-    //       type: mongoose.Schema.Types.ObjectId,
-    //       ref: "Category",
-    //     },
-    //   },
-    // ],
-    categories: [String],
+    categories: [
+      {
+        categoryId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Category",
+        },
+      },
+    ],
     stock: {
       type: Number,
       default: 0,

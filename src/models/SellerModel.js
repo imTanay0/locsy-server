@@ -26,8 +26,12 @@ const sellerSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Subscription",
     },
+    shopAddress: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Address",
+    },
     isApproved: {
-      type: Boolean,
+      type: Boolean, // By Admins
       default: false,
     },
     approvalDetails: {

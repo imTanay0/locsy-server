@@ -11,6 +11,9 @@ import {
 } from "../utils/pruduct-utils/index.js";
 import { getUsersForSellers } from "../utils/seller-utils/index.js";
 
+
+/*
+! Need Changes
 export const createProduct = async (req, res) => {
   const { productName, price, productDescription, stock, categories } =
     req.body;
@@ -75,9 +78,11 @@ export const createProduct = async (req, res) => {
       productName,
       productDescription,
       price,
-      productImage: {
-        public_id: mycloud.public_id,
-        url: mycloud.secure_url,
+      mainImage: {
+        image: {
+          public_id: mycloud.public_id,
+          url: mycloud.secure_url,
+        },
       },
       stock,
       categories: resolvedCategories.map((cat) => cat._id),
@@ -92,6 +97,8 @@ export const createProduct = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+*/
 
 export const getSllerProducts = async (req, res) => {
   try {

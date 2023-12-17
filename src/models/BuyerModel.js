@@ -9,7 +9,18 @@ const buyerSchema = new mongoose.Schema(
     paymentInformation: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "PaymentInformation",
-    }
+    },
+    addresses: [
+      {
+        address: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Address",
+        },
+        isDefault: {
+          type: Boolean,
+        },
+      },
+    ],
   },
   { timestamps: true }
 );

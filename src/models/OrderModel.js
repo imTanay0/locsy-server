@@ -14,17 +14,36 @@ const orderSchema = new mongoose.Schema(
         },
         orderedQuantity: {
           type: Number,
+          required: true,
+          min: [1, "Quantity can not be less then 1."],
           default: 1,
         },
       },
     ],
+    totalPrice: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+    discountedOrderPrice: {
+      type: Number,
+      required: true,
+    },
+    address: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Address",
+    },
     orderStatus: {
       type: String,
-      enum: ["pending", "processing", "shipped", "delivered"],
-      default: "pending",
+      enum: ["PENDING", "CANCELLED", "SHIPPED", "DELIVERED"],
+      default: "PENDING",
     },
-    transactionId: {
+    paymentId: {
       type: String,
+    },
+    isPaymentDone: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }

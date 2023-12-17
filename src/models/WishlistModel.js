@@ -8,12 +8,30 @@ const wishlistSchema = new mongoose.Schema(
     },
     products: [
       {
-        productId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Product",
+        product: {
+          productId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Product",
+          },
+          quantity: {
+            type: Number,
+            required: true,
+            min: [1, "Quantity can not be less then 1."],
+            default: 1,
+          },
         },
       },
     ],
+    totalPrice: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+    totalItems: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
   },
   { timestamps: true }
 );
