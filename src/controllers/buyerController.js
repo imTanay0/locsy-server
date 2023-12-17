@@ -3,29 +3,9 @@ import User from "../models/UserModel.js";
 import sendToken from "./../utils/sendToken.js";
 
 export const registerBuyer = async (req, res) => {
-  const {
-    fname,
-    lname,
-    email,
-    password,
-    contactNo,
-    street,
-    city,
-    state,
-    zipCode,
-  } = req.body;
+  const { fname, lname, email, password, contactNo } = req.body;
 
-  if (
-    !fname ||
-    !lname ||
-    !email ||
-    !password ||
-    !contactNo ||
-    !street ||
-    !city ||
-    !state ||
-    !zipCode
-  ) {
+  if (!fname || !lname || !email || !password || !contactNo) {
     return res.status(400).json({
       success: false,
       message: "Please fill in all the required fields",
@@ -41,12 +21,6 @@ export const registerBuyer = async (req, res) => {
         .json({ success: false, message: "User already exists" });
     }
 
-    // Construct address object if address fields are provided
-    const address =
-      street && city && state && zipCode
-        ? { street, city, state, zipCode }
-        : undefined;
-
     // Create a new user
     user = await User.create({
       fname,
@@ -54,7 +28,6 @@ export const registerBuyer = async (req, res) => {
       email,
       password,
       contactNo,
-      address,
       role: 3, // Buyer role
     });
 

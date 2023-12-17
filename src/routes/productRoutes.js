@@ -1,7 +1,7 @@
 import express from "express";
 
 import {
-  createProduct,
+  // createProduct,
   getSllerProducts,
   getAllProducts,
   searchProducts,
@@ -12,7 +12,7 @@ import singleUpload from "../middlewares/multer.js";
 
 const router = express.Router();
 
-router.post("/create", singleUpload, isAuthenticated, createProduct);
+// router.post("/create", singleUpload, isAuthenticated, createProduct);
 
 router.get("/get", isAuthenticated, getSllerProducts);
 
