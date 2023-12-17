@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import crypto from "crypto-js";
 
-const userSchema = mongoose.Schema(
+const userSchema = new mongoose.Schema(
   {
     fname: {
       type: String,
@@ -30,28 +30,30 @@ const userSchema = mongoose.Schema(
       type: String,
       default: "0",
     },
-    address: {
-      street: {
-        type: String,
+    // address: {
+    //   street: {
+    //     type: String,
+    //   },
+    //   city: {
+    //     type: String,
+    //   },
+    //   state: {
+    //     type: String,
+    //   },
+    //   zipCode: {
+    //     type: String,
+    //   },
+    //   country: {
+    //     type: String,
+    //     default: "India",
+    //   },
+    // },
+    address: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Address",
       },
-      city: {
-        type: String,
-      },
-      state: {
-        type: String,
-      },
-      zipCode: {
-        type: String,
-      },
-      country: {
-        type: String,
-        default: "India",
-      },
-    },
-    addressId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Address",
-    },
+    ],
     role: {
       type: Number,
       enum: [1, 2, 3], // 1 -> Admin, 2 -> Seller, 3 -> Buyer

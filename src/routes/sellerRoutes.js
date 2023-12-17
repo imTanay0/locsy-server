@@ -15,7 +15,7 @@ router.post("/register", singleUpload, registerSeller);
 
 router.post("/login", loginSeller);
 
-router.post("/logout", logoutSeller);
+router.post("/logout", isAuthenticated, logoutSeller);
 
 router.get("/", isAuthenticated, getSeller);
 
