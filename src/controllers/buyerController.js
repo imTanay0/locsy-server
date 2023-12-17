@@ -119,3 +119,19 @@ export const logoutBuyer = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// TODOs -------->
+
+// export const getBuyerById = async (req, res) => {}
+
+// export const getBuyerByEmail = async (req, res) => {}
+
+// export const deleteBuyer = async (req, res) => {}
+
+// export const getBuyerProfile = async (req, res) => {}
+
+// export const updateBuyer = async (req, res) => {}
+
+// export const getAllBuyers = async (req, res) => {}
+
+// export const updateBuyerPassword = async (req, res) => {}

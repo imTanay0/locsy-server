@@ -6,10 +6,6 @@ const buyerSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
-    paymentInformation: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "PaymentInformation",
-    },
     addresses: [
       {
         address: {

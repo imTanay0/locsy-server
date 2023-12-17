@@ -41,6 +41,9 @@ const orderSchema = new mongoose.Schema(
     paymentId: {
       type: String,
     },
+    paymentInformation: {
+      type: String,
+    },
     isPaymentDone: {
       type: Boolean,
       default: false,
