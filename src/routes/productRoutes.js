@@ -2,7 +2,7 @@ import express from "express";
 
 import {
   // createProduct,
-  getSllerProducts,
+  getSellerProducts,
   getAllProducts,
   searchProducts,
   getProductByCategory,
@@ -14,7 +14,7 @@ const router = express.Router();
 
 // router.post("/create", singleUpload, isAuthenticated, createProduct);
 
-router.get("/get", isAuthenticated, getSllerProducts);
+router.get("/get", isAuthenticated, getSellerProducts);
 
 router.get("/getall", getAllProducts);
 

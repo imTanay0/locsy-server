@@ -100,7 +100,7 @@ export const createProduct = async (req, res) => {
 
 */
 
-export const getSllerProducts = async (req, res) => {
+export const getSellerProducts = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
 

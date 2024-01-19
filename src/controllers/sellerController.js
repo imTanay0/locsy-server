@@ -211,3 +211,19 @@ export const getSeller = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// TODO ------------>
+
+// export const getSellerById = async (req, res) => {}
+
+// export const updateSeller = async (req, res) => {}
+
+// export const deleteSeller = async (req, res) => {}
+
+// export const getAllSellers = async (req, res) => {}
+
+// export const getSellerProducts = async (req, res) => {}
+
+// export const getSellerOrders = async (req, res) => {}
+
+// export const getSellerSales = async (req, res) => {}
