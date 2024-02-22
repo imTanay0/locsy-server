@@ -1,6 +1,8 @@
 import express from "express";
 
 import {
+  deleteLoggedInBuyer,
+  getLoggedInBuyer,
   loginBuyer,
   logoutBuyer,
   registerBuyer,
@@ -15,5 +17,9 @@ router.post("/register", registerBuyer);
 router.post("/login", loginBuyer);
 
 router.post("/logout", isAuthenticated, logoutBuyer);
+
+router.get("/get", isAuthenticated, getLoggedInBuyer);
+
+router.delete("/delete", isAuthenticated, deleteLoggedInBuyer);
 
 export default router;

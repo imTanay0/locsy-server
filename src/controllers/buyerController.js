@@ -5,7 +5,7 @@ import sendToken from "./../utils/sendToken.js";
 export const registerBuyer = async (req, res) => {
   const { fname, lname, email, password, contactNo } = req.body;
 
-  if (!fname || !lname || !email || !password || !contactNo) {
+  if (!fname || !lname || !email || !password) {
     return res.status(400).json({
       success: false,
       message: "Please fill in all the required fields",
@@ -27,7 +27,6 @@ export const registerBuyer = async (req, res) => {
       lname,
       email,
       password,
-      contactNo,
       role: 3, // Buyer role
     });
 
@@ -120,9 +119,89 @@ export const logoutBuyer = async (req, res) => {
   }
 };
 
-// TODOs -------->
+export const getLoggedInBuyer = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
 
-// export const getBuyerById = async (req, res) => {}
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    if (user.role !== 3) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
+    const buyer = await Buyer.findOne({ userId: user._id });
+
+    if (!buyer) {
+      return res.status(404).json({
+        success: false,
+        message: "Buyer not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      user,
+      buyer,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const deleteLoggedInBuyer = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    if (user.role !== 3) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
+    const buyer = await Buyer.findOne({ userId: user._id });
+
+    if (!buyer) {
+      return res.status(404).json({
+        success: false,
+        message: "Buyer not found",
+      });
+    }
+
+    const deletedBuyer = await Buyer.findByIdAndDelete(buyer._id);
+
+    console.log(deletedBuyer);
+
+    const deletedUser = await User.findByIdAndDelete(user._id);
+
+    res.status(200).json({
+      success: true,
+      deletedUser,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// TODOs -------->
 
 // export const getBuyerByEmail = async (req, res) => {}
 
