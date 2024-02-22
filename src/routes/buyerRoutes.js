@@ -5,8 +5,7 @@ import {
   logoutBuyer,
   registerBuyer,
 } from "../controllers/buyerController.js";
-// import { isAuthenticated } from "../middlewares/auth.js";
-import { isAuthenticated } from './../middlewares/auth.js';
+import { isAuthenticated } from "./../middlewares/auth.js";
 
 const router = express.Router();
 

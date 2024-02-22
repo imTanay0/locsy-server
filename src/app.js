@@ -7,6 +7,7 @@ import bodyParser from "body-parser";
 import multer from "multer";
 
 import userRoutes from "./routes/userRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 import sellerRoutes from "./routes/sellerRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import buyerRoutes from "./routes/buyerRoutes.js";
@@ -36,6 +37,7 @@ app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 
 // ROUTES
 app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/seller", sellerRoutes);
 app.use("/api/v1/product", productRoutes);
 app.use("/api/v1/buyer", buyerRoutes);
