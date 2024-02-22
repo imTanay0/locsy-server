@@ -54,7 +54,7 @@ export const registerSeller = async (req, res) => {
     }
 
     // Construct address object if address fields are provided
-    const address =
+    const shopAddress =
       street && city && state && zipCode
         ? { street, city, state, zipCode }
         : undefined;
@@ -71,7 +71,6 @@ export const registerSeller = async (req, res) => {
       email,
       password,
       contactNo,
-      address,
       role: 2, // Seller role
     });
 
@@ -84,6 +83,7 @@ export const registerSeller = async (req, res) => {
         url: mycloud.secure_url,
       },
       shopDescription,
+      shopAddress,
     });
 
     sendToken(

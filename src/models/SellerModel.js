@@ -27,8 +27,22 @@ const sellerSchema = new mongoose.Schema(
       ref: "Subscription",
     },
     shopAddress: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Address",
+      street: {
+        type: String,
+      },
+      city: {
+        type: String,
+      },
+      state: {
+        type: String,
+      },
+      zipCode: {
+        type: String,
+      },
+      country: {
+        type: String,
+        default: "India",
+      },
     },
     isApproved: {
       type: Boolean, // By Admins
