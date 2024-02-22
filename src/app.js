@@ -5,6 +5,8 @@ import helmet from "helmet";
 import morgan from "morgan";
 import bodyParser from "body-parser";
 import multer from "multer";
+import dotenv from "dotenv";
+import cloudinary from "cloudinary";
 
 import userRoutes from "./routes/userRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
@@ -13,8 +15,15 @@ import productRoutes from "./routes/productRoutes.js";
 import buyerRoutes from "./routes/buyerRoutes.js";
 
 // CONFIG
+dotenv.config({ path: ".env" });
 const app = express();
 const upload = multer();
+
+cloudinary.v2.config({
+  cloud_name: process.env.CLOUDINARY_CLIENT_NAME,
+  api_key: process.env.CLOUDINARY_CLIENT_API,
+  api_secret: process.env.CLOUDINARY_CLIENT_SECRET,
+});
 
 // MIDDLEWARES
 app.use(
