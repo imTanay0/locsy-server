@@ -212,13 +212,53 @@ export const getSeller = async (req, res) => {
   }
 };
 
+export const deleteLoggedInSeller = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    if (user.role !== 2) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
+    const seller = await Seller.findOne({ userId: user._id });
+
+    if (!seller) {
+      return res.status(404).json({
+        success: false,
+        message: "Seller not found",
+      });
+    }
+
+    const deletedSeller = await Seller.findByIdAndDelete(seller._id);
+
+    console.log(deletedSeller);
+
+    const deletedUser = await User.findByIdAndDelete(user._id);
+
+    res.status(200).json({
+      success: true,
+      deletedUser,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // TODO ------------>
 
 // export const getSellerById = async (req, res) => {}
 
 // export const updateSeller = async (req, res) => {}
-
-// export const deleteSeller = async (req, res) => {}
 
 // export const getAllSellers = async (req, res) => {}
 
