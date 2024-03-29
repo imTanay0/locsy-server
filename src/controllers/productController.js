@@ -353,3 +353,30 @@ export const updateProduct = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+export const deleteProduct = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    rm(product.mainImage.image.url, () => {
+      console.log("Product Photo Deleted");
+    });
+
+    await product.deleteOne();
+
+    return res.status(200).json({
+      success: true,
+      message: "Product Deleted Successfully",
+      product,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};

@@ -9,6 +9,7 @@ import {
   getLatestProducts,
   getProductById,
   updateProduct,
+  deleteProduct,
 } from "../controllers/productController.js";
 import { isAuthenticated, isSeller } from "../middlewares/auth.js";
 import singleUpload from "../middlewares/multer.js";
@@ -27,6 +28,10 @@ router.get("/search", searchProducts);
 
 router.get("/search/:category", getProductByCategory);
 
-router.route("/:id").get(getProductById).put(updateProduct);
+router
+  .route("/:id")
+  .get(getProductById)
+  .put(isSeller, singleUpload, updateProduct)
+  .delete(isSeller, deleteProduct);
 
 export default router;
