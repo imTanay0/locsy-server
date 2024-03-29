@@ -7,6 +7,8 @@ import {
   searchProducts,
   getProductByCategory,
   getLatestProducts,
+  getProductById,
+  updateProduct,
 } from "../controllers/productController.js";
 import { isAuthenticated, isSeller } from "../middlewares/auth.js";
 import singleUpload from "../middlewares/multer.js";
@@ -15,7 +17,7 @@ const router = express.Router();
 
 router.post("/create", singleUpload, isSeller, createProduct);
 
-router.get("/get", isAuthenticated, getSellerProducts);
+router.get("/get", isSeller, getSellerProducts);
 
 router.get("/getall", getAllProducts);
 
@@ -24,5 +26,7 @@ router.get("/latest", getLatestProducts);
 router.get("/search", searchProducts);
 
 router.get("/search/:category", getProductByCategory);
+
+router.route("/:id").get(getProductById).put(updateProduct);
 
 export default router;

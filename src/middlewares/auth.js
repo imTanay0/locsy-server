@@ -36,16 +36,16 @@ export const isSeller = async (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    req.user = await User.findById(decoded._id);
+    const user = await User.findById(decoded._id);
 
-    if (req.user.role !== 2) {
+    if (user.role !== 2) {
       return res.status(401).json({
         success: false,
         message: "Unauthorized",
       });
     }
 
-    req.seller = await Seller.findById(req.user._id);
+    req.seller = await Seller.findOne({userId: user._id});
 
     next();
   } catch (error) {

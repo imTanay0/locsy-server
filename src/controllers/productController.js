@@ -1,4 +1,5 @@
 import cloudinary from "cloudinary";
+import { rm } from "fs";
 
 import Product from "../models/ProductModel.js";
 import Seller from "../models/SellerModel.js";
@@ -41,10 +42,14 @@ export const createProduct = async (req, res) => {
     const mycloud = await cloudinary.v2.uploader.upload(fileUri.content);
 
     // Check if categories exist, create if not
-    const categoryPromises = categories.map(async (category) => {
-      const existingCategory = await Category.findOne({ category });
-      return existingCategory || Category.create({ category });
-    });
+    let categoryPromises = [];
+
+    if (!!categories && categories.length > 0) {
+      categoryPromises = categories.map(async (category) => {
+        const existingCategory = await Category.findOne({ category });
+        return existingCategory || Category.create({ category });
+      });
+    }
 
     const resolvedCategories = await Promise.all(categoryPromises);
 
@@ -66,6 +71,35 @@ export const createProduct = async (req, res) => {
     res.status(201).json({
       success: true,
       newProduct,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const getProductById = async (req, res) => {
+  const id = req.params.id;
+
+  if (!id) {
+    return res.status(400).json({
+      success: false,
+      message: "Product ID is required",
+    });
+  }
+
+  try {
+    const product = await Product.findById(id);
+
+    if (!product) {
+      return req.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      product,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -149,6 +183,7 @@ export const getAllProducts = async (req, res) => {
       }
 
       return {
+        productId: product._id,
         productName: product.productName,
         productDescription: product.productDescription,
         productImage: product.productImage,
@@ -274,6 +309,45 @@ export const getProductByCategory = async (req, res) => {
     res.status(200).json({
       success: true,
       productResults,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const updateProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { productName, productDescription, price, stock } = req.body;
+    const file = req.file;
+
+    const product = await Product.findById(id);
+
+    if (!product) {
+      return req.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    if (file) {
+      rm(product.mainImage.image, () => {
+        console.log("Old Photo Deleted");
+      });
+      product.mainImage.image = file.path;
+    }
+
+    if (productName) product.productName = productName;
+    if (productDescription) product.productDescription = productDescription;
+    if (price) product.price = price;
+    if (stock) product.stock = stock;
+
+    await product.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Product updated successfully",
+      product,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
