@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const wishlistSchema = new mongoose.Schema(
+const CartSchema = new mongoose.Schema(
   {
     buyerId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -36,4 +36,4 @@ const wishlistSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("Wishlist", wishlistSchema);
+export default mongoose.model("Cart", CartSchema);

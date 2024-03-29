@@ -13,6 +13,7 @@ import adminRoutes from "./routes/adminRoutes.js";
 import sellerRoutes from "./routes/sellerRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import buyerRoutes from "./routes/buyerRoutes.js";
+import cartRoutes from "./routes/cartRoutes.js";
 
 // CONFIG
 dotenv.config({ path: ".env" });
@@ -50,6 +51,7 @@ app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/seller", sellerRoutes);
 app.use("/api/v1/product", productRoutes);
 app.use("/api/v1/buyer", buyerRoutes);
+app.use("/api/v1/cart", cartRoutes);
 
 app.get("/", (req, res) => res.send(`Hello Admin`));
 

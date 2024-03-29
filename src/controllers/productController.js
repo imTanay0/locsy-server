@@ -11,7 +11,6 @@ import {
 } from "../utils/pruduct-utils/index.js";
 import { getUsersForSellers } from "../utils/seller-utils/index.js";
 
-// ! Need Changes
 export const createProduct = async (req, res) => {
   const { productName, price, productDescription, stock, categories } =
     req.body;
@@ -27,23 +26,7 @@ export const createProduct = async (req, res) => {
   }
 
   try {
-    const user = await User.findById(req.user._id);
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
-    }
-
-    if (user.role !== 2) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized",
-      });
-    }
-
-    const seller = await Seller.findOne({ userId: user._id });
+    const seller = await Seller.findById(req.seller._id);
 
     if (!seller) {
       return res.status(404).json({
@@ -91,23 +74,7 @@ export const createProduct = async (req, res) => {
 
 export const getSellerProducts = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id);
-
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
-    }
-
-    if (user.role !== 2) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized",
-      });
-    }
-
-    const seller = await Seller.findOne({ userId: user._id });
+    const seller = await Seller.findById(req.seller._id);
 
     if (!seller) {
       return res.status(404).json({
@@ -205,6 +172,26 @@ export const getAllProducts = async (req, res) => {
     res.status(200).json({
       success: true,
       filteredUpdatedProducts,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const getLatestProducts = async (req, res) => {
+  try {
+    const products = await Product.find().sort({ createdAt: -1 }).limit(3);
+
+    if (!products || products.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No products found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      products,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
