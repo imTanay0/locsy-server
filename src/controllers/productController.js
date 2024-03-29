@@ -11,9 +11,7 @@ import {
 } from "../utils/pruduct-utils/index.js";
 import { getUsersForSellers } from "../utils/seller-utils/index.js";
 
-
-/*
-! Need Changes
+// ! Need Changes
 export const createProduct = async (req, res) => {
   const { productName, price, productDescription, stock, categories } =
     req.body;
@@ -21,14 +19,7 @@ export const createProduct = async (req, res) => {
   // console.log("Request Body:", req.body);
   // console.log("Request File:", req.file);
 
-  if (
-    !productName ||
-    !price ||
-    !productDescription ||
-    !stock ||
-    !categories ||
-    categories.length === 0
-  ) {
+  if (!productName || !price || !productDescription || !stock) {
     return res.status(400).json({
       success: false,
       message: "Please fill in all fields",
@@ -97,8 +88,6 @@ export const createProduct = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
-
-*/
 
 export const getSellerProducts = async (req, res) => {
   try {
