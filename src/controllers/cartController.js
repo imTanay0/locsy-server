@@ -134,6 +134,7 @@ export const deleteCartItem = async (req, res) => {
         message: "Invalid product ID. Please provide a valid string.",
       });
     }
+
     // Find the cart and handle potential errors
     const cart = await Cart.findOne({ buyerId: req.user._id });
     if (!cart) {
@@ -142,6 +143,7 @@ export const deleteCartItem = async (req, res) => {
         message: "Cart not found for this user.",
       });
     }
+
     // Find the product index and handle potential errors
     const productIndex = cart.products.findIndex(
       (item) => item.productId.toString() === productId
@@ -152,13 +154,16 @@ export const deleteCartItem = async (req, res) => {
         message: "Product not found in cart.",
       });
     }
+
     // Update cart items and total values
     cart.totalPrice -=
       cart.products[productIndex].quantity * cart.products[productIndex].price;
     cart.totalItems -= cart.products[productIndex].quantity;
     cart.products.splice(productIndex, 1);
+
     // Save the updated cart and handle potential errors
     const savedCart = await cart.save();
+
     if (!savedCart) {
       return res.status(500).json({
         success: false,
@@ -168,6 +173,118 @@ export const deleteCartItem = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Item deleted from cart successfully.",
+      cart: savedCart,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const increaseCartItemQuantity = async (req, res) => {
+  const { productId } = req.body;
+  try {
+    // Validate input - Ensure productId is a string
+    if (!productId || typeof productId !== "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid product ID. Please provide a valid string.",
+      });
+    }
+
+    // Find the cart and handle potential errors
+    const cart = await Cart.findOne({ buyerId: req.user._id });
+    if (!cart) {
+      return res.status(404).json({
+        success: false,
+        message: "Cart not found for this user.",
+      });
+    }
+
+    // Find the product index and handle potential errors
+    const productIndex = cart.products.findIndex(
+      (item) => item.productId.toString() === productId
+    );
+    if (productIndex === -1) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found in cart.",
+      });
+    }
+
+    // Update cart items and total values
+    cart.totalPrice +=
+      cart.products[productIndex].price * cart.products[productIndex].quantity;
+    cart.totalItems += cart.products[productIndex].quantity;
+    cart.products[productIndex].quantity++;
+
+    // Save the updated cart and handle potential errors
+    const savedCart = await cart.save();
+
+    if (!savedCart) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to increase item quantity. Please try again later.",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      message: "Item quantity increased successfully.",
+      cart: savedCart,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const decreaseCartItemQuantity = async (req, res) => {
+  const { productId } = req.body;
+  try {
+    // Validate input - Ensure productId is a string
+    if (!productId || typeof productId !== "string") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid product ID. Please provide a valid string.",
+      });
+    }
+
+    // Find the cart and handle potential errors
+    const cart = await Cart.findOne({ buyerId: req.user._id });
+    if (!cart) {
+      return res.status(404).json({
+        success: false,
+        message: "Cart not found for this user.",
+      });
+    }
+
+    // Find the product index and handle potential errors
+    const productIndex = cart.products.findIndex(
+      (item) => item.productId.toString() === productId
+    );
+    if (productIndex === -1) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found in cart.",
+      });
+    }
+
+    // Update cart items and total values
+    cart.totalPrice -=
+      cart.products[productIndex].price * cart.products[productIndex].quantity;
+    cart.totalItems -= cart.products[productIndex].quantity;
+    cart.products[productIndex].quantity--;
+
+    // Save the updated cart and handle potential errors
+    const savedCart = await cart.save();
+
+    if (!savedCart) {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to decrease item quantity. Please try again later.",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      message: "Item quantity decreased successfully.",
       cart: savedCart,
     });
   } catch (error) {
