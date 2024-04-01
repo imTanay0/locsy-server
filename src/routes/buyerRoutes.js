@@ -18,7 +18,7 @@ router.post("/login", loginBuyer);
 
 router.post("/logout", isAuthenticated, logoutBuyer);
 
-router.get("/get", isAuthenticated, getLoggedInBuyer);
+router.get("/", isAuthenticated, getLoggedInBuyer);
 
 router.delete("/delete", isAuthenticated, deleteLoggedInBuyer);
 

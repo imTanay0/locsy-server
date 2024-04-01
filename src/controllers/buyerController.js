@@ -68,7 +68,7 @@ export const loginBuyer = async (req, res) => {
 
     if (!isMatch) {
       return res
-        .status(401)
+        .status(404)
         .json({ success: false, message: "Invalid email or password" });
     }
 

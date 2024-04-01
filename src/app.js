@@ -53,6 +53,8 @@ app.use("/api/v1/product", productRoutes);
 app.use("/api/v1/buyer", buyerRoutes);
 app.use("/api/v1/cart", cartRoutes);
 
-app.get("/", (req, res) => res.send(`Hello Admin`));
+app.get("/", (req, res) =>
+  res.send(`Hello Users, visit here: ${process.env.CORS_ORIGIN}`)
+);
 
 export { app };
