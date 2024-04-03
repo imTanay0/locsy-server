@@ -55,13 +55,6 @@ export const loginBuyer = async (req, res) => {
   }
 
   try {
-    if (req.cookies.token) {
-      return res.status(401).json({
-        success: false,
-        message: "Already logged in",
-      });
-    }
-
     const user = await User.findOne({ email }).select("+password");
 
     if (!user) {
@@ -70,7 +63,7 @@ export const loginBuyer = async (req, res) => {
         message: "Invalid email or password",
       });
     }
-    
+
     const isMatch = await user.comparePassword(password);
 
     if (!isMatch) {
