@@ -1,6 +1,8 @@
 // import crypto from "crypto-js";
 
 import User from "../models/UserModel.js";
+import Seller from "../models/SellerModel.js";
+import Buyer from "../models/BuyerModel.js";
 import sendToken from "./../utils/sendToken.js";
 
 export const register = async (req, res) => {
@@ -81,18 +83,50 @@ export const login = async (req, res) => {
 // fix the code
 export const logout = async (req, res) => {
   try {
-      res
-        .status(200)
-        .cookie("token", null, {
-          expires: new Date(Date.now()),
-          httpOnly: true,
-          secure: true,
-        })
-        .json({
-          success: true,
-          message: "Logged out successfully",
-        });
+    res
+      .status(200)
+      .cookie("token", null, {
+        expires: new Date(Date.now()),
+        httpOnly: true,
+        secure: true,
+      })
+      .json({
+        success: true,
+        message: "Logged out successfully",
+      });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
+export const getLoggedInUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    let role;
+
+    if (user.role === 1) {
+      return res.status(200).json({ success: true, user });
+    }
+
+    if (user.role === 2) {
+      const seller = await Seller.findOne({ userId: user._id });
+      return res.status(200).json({ success: true, user, role: seller });
+    }
+
+    if (user.role === 3) {
+      const buyer = await Buyer.findOne({ userId: user._id });
+      return res.status(200).json({ success: true, user, role: buyer });
+    }
+
+    res.status(401).json({ success: false, message: "Unauthorized" });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
