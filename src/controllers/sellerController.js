@@ -239,6 +239,17 @@ export const deleteLoggedInSeller = async (req, res) => {
       });
     }
 
+    const { result } = await cloudinary.v2.uploader.destroy(
+      seller.shopImage.public_id
+    );
+
+    if (result !== "ok") {
+      return res.status(400).json({
+        success: false,
+        message: "Failed to delete image",
+      });
+    }
+
     const deletedSeller = await Seller.findByIdAndDelete(seller._id);
 
     console.log(deletedSeller);
@@ -248,6 +259,22 @@ export const deleteLoggedInSeller = async (req, res) => {
     res.status(200).json({
       success: true,
       deletedUser,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const testDeleteImage = async (req, res) => {
+  try {
+    const { result } = await cloudinary.v2.uploader.destroy(
+      "mb5sovfhuzvvp9irjipn"
+    );
+
+    console.log(result);
+
+    res.status(200).json({
+      success: true,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
