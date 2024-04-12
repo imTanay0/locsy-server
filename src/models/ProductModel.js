@@ -29,18 +29,18 @@ const productSchema = new mongoose.Schema(
         },
       },
     },
-    subImages: [
-      {
-        subImage: {
-          public_id: {
-            type: String,
-          },
-          url: {
-            type: String,
-          },
-        },
-      },
-    ],
+    // subImages: [
+    //   {
+    //     subImage: {
+    //       public_id: {
+    //         type: String,
+    //       },
+    //       url: {
+    //         type: String,
+    //       },
+    //     },
+    //   },
+    // ],
     sellerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Seller",

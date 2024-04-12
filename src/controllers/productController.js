@@ -70,6 +70,7 @@ export const createProduct = async (req, res) => {
 
     res.status(201).json({
       success: true,
+      message: "Product created successfully",
       newProduct,
     });
   } catch (error) {
@@ -138,6 +139,8 @@ export const getSellerProducts = async (req, res) => {
 export const getAllProducts = async (req, res) => {
   try {
     const products = await Product.find();
+
+    console.log(products);
 
     if (!products || products.length === 0) {
       return res.status(404).json({
