@@ -334,10 +334,25 @@ export const updateProduct = async (req, res) => {
     }
 
     if (file) {
-      rm(product.mainImage.image, () => {
-        console.log("Old Photo Deleted");
-      });
-      product.mainImage.image = file.path;
+      const { result } = await cloudinary.v2.uploader.destroy(
+        product.mainImage.image.public_id
+      );
+
+      if (result !== "ok") {
+        return res.status(400).json({
+          success: false,
+          message: "Failed to delete image",
+        });
+      }
+
+      const fileUri = getDataUri(file);
+      const mycloud = await cloudinary.v2.uploader.upload(fileUri.content);
+      product.mainImage = {
+        image: {
+          public_id: mycloud.public_id,
+          url: mycloud.secure_url,
+        },
+      };
     }
 
     if (productName) product.productName = productName;
