@@ -140,7 +140,7 @@ export const getAllProducts = async (req, res) => {
   try {
     const products = await Product.find();
 
-    console.log(products);
+    // console.log(products);
 
     if (!products || products.length === 0) {
       return res.status(404).json({
@@ -189,7 +189,7 @@ export const getAllProducts = async (req, res) => {
         productId: product._id,
         productName: product.productName,
         productDescription: product.productDescription,
-        productImage: product.productImage,
+        productImage: product.mainImage.image.url,
         price: product.price,
         offerPrice: product.offerPrice,
         sellerName: `${user.fname} ${user.lname}`,
