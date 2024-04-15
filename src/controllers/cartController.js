@@ -6,16 +6,23 @@ import User from "../models/UserModel.js";
 export const createCart = async (req, res) => {
   const { productId } = req.body;
 
+  if (!productId || typeof productId !== "string") {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid product ID. Please provide a valid string.",
+    });
+  }
+
   try {
-    // Validate input - Ensure productId is a valid string
-    if (!productId || typeof productId !== "string") {
-      return res.status(400).json({
+    const user = await User.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({
         success: false,
-        message: "Invalid product ID. Please provide a valid string.",
+        message: "Unauthorized.",
       });
     }
 
-    // Fetch the product and handle potential errors
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({
@@ -24,17 +31,30 @@ export const createCart = async (req, res) => {
       });
     }
 
-    // Create a new cart with proper initialization
-    const newCart = new Cart({
-      buyerId: req.user._id,
+    const buyer = await Buyer.findOne({ userId: user._id });
+    if (!buyer) {
+      return res.status(404).json({
+        success: false,
+        message: "Buyer not found.",
+      });
+    }
+
+    const cart = await Cart.findOne({ buyerId: buyer._id });
+    if (cart) {
+      return res.status(409).json({
+        success: false,
+        message: "Cart already exists.",
+      });
+    }
+
+    const newCart = new Cart.create({
+      buyerId: buyer._id,
       products: [{ product: product._id, quantity: 1 }],
       totalPrice: product.price,
       totalItems: 1,
     });
 
-    // Save the new cart and handle potential errors
-    const savedCart = await newCart.save();
-    if (!savedCart) {
+    if (!newCart) {
       return res.status(500).json({
         success: false,
         message: "Failed to create cart. Please try again later.",
@@ -44,7 +64,7 @@ export const createCart = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Cart created successfully.",
-      cart: savedCart,
+      cart: newCart,
     });
   } catch (error) {
     console.error("Error creating cart:", error);
@@ -82,8 +102,16 @@ export const addCartItem = async (req, res) => {
       });
     }
 
+    const buyer = await Buyer.findOne({ userId: req.user._id });
+    if (!buyer) {
+      return res.status(404).json({
+        success: false,
+        message: "Buyer not found.",
+      });
+    }
+
     // Find the existing cart and handle potential errors
-    const cart = await Cart.findOne({ buyerId: req.user._id });
+    const cart = await Cart.findOne({ buyerId: buyer._id });
     if (!cart) {
       return res.status(404).json({
         success: false,
@@ -135,8 +163,16 @@ export const deleteCartItem = async (req, res) => {
       });
     }
 
+    const buyer = await Buyer.findOne({ userId: req.user._id });
+    if (!buyer) {
+      return res.status(404).json({
+        success: false,
+        message: "Buyer not found.",
+      });
+    }
+
     // Find the cart and handle potential errors
-    const cart = await Cart.findOne({ buyerId: req.user._id });
+    const cart = await Cart.findOne({ buyerId: buyer._id });
     if (!cart) {
       return res.status(404).json({
         success: false,
@@ -191,8 +227,16 @@ export const increaseCartItemQuantity = async (req, res) => {
       });
     }
 
+    const buyer = await Buyer.findOne({ userId: req.user._id });
+    if (!buyer) {
+      return res.status(404).json({
+        success: false,
+        message: "Buyer not found.",
+      });
+    }
+
     // Find the cart and handle potential errors
-    const cart = await Cart.findOne({ buyerId: req.user._id });
+    const cart = await Cart.findOne({ buyerId: buyer._id });
     if (!cart) {
       return res.status(404).json({
         success: false,
@@ -247,8 +291,16 @@ export const decreaseCartItemQuantity = async (req, res) => {
       });
     }
 
+    const buyer = await Buyer.findOne({ userId: req.user._id });
+    if (!buyer) {
+      return res.status(404).json({
+        success: false,
+        message: "Buyer not found.",
+      });
+    }
+
     // Find the cart and handle potential errors
-    const cart = await Cart.findOne({ buyerId: req.user._id });
+    const cart = await Cart.findOne({ buyerId: buyer._id });
     if (!cart) {
       return res.status(404).json({
         success: false,
@@ -287,6 +339,52 @@ export const decreaseCartItemQuantity = async (req, res) => {
       message: "Item quantity decreased successfully.",
       cart: savedCart,
     });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const getCart = async (req, res) => {
+  if (!req.user._id) {
+    return res.status(401).json({
+      success: false,
+      message: "Unauthorized.",
+    });
+  }
+
+  try {
+    const buyer = await Buyer.findOne({ userId: req.user._id });
+    if (!buyer) {
+      return res.status(404).json({
+        success: false,
+        message: "Buyer not found.",
+      });
+    }
+
+    const cart = await Cart.findOne({ buyerId: buyer._id });
+    if (!cart) {
+      return res.status(404).json({
+        success: false,
+        message: "Cart not found for this user.",
+      });
+    }
+    res.status(200).json({ success: true, cart });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const getAllCarts = async (req, res) => {
+  try {
+    const carts = await Cart.find({});
+    if (!carts || carts.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No carts found",
+      });
+    }
+
+    res.status(200).json({ success: true, carts });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
