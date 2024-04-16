@@ -106,7 +106,7 @@ export const addCartItem = async (req, res) => {
 
     // Find the existing product index (if any)
     const existingProductIndex = cart.products.findIndex(
-      (item) => item.product.productId === productId
+      (item) => item.productId.toString() === productId.toString()
     );
 
     // Update cart items and total values
