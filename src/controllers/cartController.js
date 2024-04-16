@@ -47,9 +47,9 @@ export const createCart = async (req, res) => {
       });
     }
 
-    const newCart = new Cart.create({
+    const newCart = await Cart.create({
       buyerId: buyer._id,
-      products: [{ product: product._id, quantity: 1 }],
+      products: [{ productId, quantity: 1 }],
       totalPrice: product.price,
       totalItems: 1,
     });
@@ -76,24 +76,9 @@ export const createCart = async (req, res) => {
 };
 
 export const addCartItem = async (req, res) => {
-  const { productId, quantity } = req.body;
+  const { productId } = req.body;
 
   try {
-    // Validate input - Ensure productId is a string and quantity is a positive number
-    if (
-      !productId ||
-      typeof productId !== "string" ||
-      typeof quantity !== "number" ||
-      quantity <= 0
-    ) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Invalid product ID or quantity. Please provide a valid string ID and a positive quantity.",
-      });
-    }
-
-    // Fetch the product and handle potential errors
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({
@@ -121,17 +106,19 @@ export const addCartItem = async (req, res) => {
 
     // Find the existing product index (if any)
     const existingProductIndex = cart.products.findIndex(
-      (item) => item.productId.toString() === productId
+      (item) => item.product.productId === productId
     );
 
     // Update cart items and total values
     if (existingProductIndex !== -1) {
-      cart.products[existingProductIndex].quantity += quantity;
+      console.log("product already exists");
+      cart.products[existingProductIndex].quantity += 1;
     } else {
-      cart.products.push({ productId, quantity });
+      console.log("product not exists");
+      cart.products.push({ productId, quantity: 1 });
     }
-    cart.totalPrice += product.price * quantity;
-    cart.totalItems += quantity;
+    cart.totalPrice += product.price;
+    cart.totalItems += 1;
 
     // Save the updated cart and handle potential errors
     const savedCart = await cart.save();
