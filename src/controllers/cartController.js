@@ -157,12 +157,20 @@ export const addCartItem = async (req, res) => {
 
 export const deleteCartItem = async (req, res) => {
   const { productId } = req.body;
+  // Validate input - Ensure productId is a string
+  if (!productId || typeof productId !== "string") {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid product ID. Please provide a valid string.",
+    });
+  }
+
   try {
-    // Validate input - Ensure productId is a string
-    if (!productId || typeof productId !== "string") {
-      return res.status(400).json({
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({
         success: false,
-        message: "Invalid product ID. Please provide a valid string.",
+        message: "Product not found.",
       });
     }
 
@@ -195,8 +203,7 @@ export const deleteCartItem = async (req, res) => {
     }
 
     // Update cart items and total values
-    cart.totalPrice -=
-      cart.products[productIndex].quantity * cart.products[productIndex].price;
+    cart.totalPrice -= cart.products[productIndex].quantity * product.price;
     cart.totalItems -= cart.products[productIndex].quantity;
     cart.products.splice(productIndex, 1);
 
@@ -209,10 +216,17 @@ export const deleteCartItem = async (req, res) => {
         message: "Failed to delete item from cart. Please try again later.",
       });
     }
+
+    const cartProducts = await getProductsForCartItems(savedCart, Product);
+    const sellers = await getSellersForProducts(cartProducts, Seller);
+    const users = await getUsersForSellers(sellers, User);
+
+    const formattedCart = returnFormattedCart(savedCart, cartProducts, users);
+
     res.status(200).json({
       success: true,
       message: "Item deleted from cart successfully.",
-      cart: savedCart,
+      cart: formattedCart,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -221,12 +235,18 @@ export const deleteCartItem = async (req, res) => {
 
 export const increaseCartItemQuantity = async (req, res) => {
   const { productId } = req.body;
+  if (!productId || typeof productId !== "string") {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid product ID. Please provide a valid string.",
+    });
+  }
   try {
-    // Validate input - Ensure productId is a string
-    if (!productId || typeof productId !== "string") {
-      return res.status(400).json({
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({
         success: false,
-        message: "Invalid product ID. Please provide a valid string.",
+        message: "Product not found.",
       });
     }
 
@@ -249,7 +269,7 @@ export const increaseCartItemQuantity = async (req, res) => {
 
     // Find the product index and handle potential errors
     const productIndex = cart.products.findIndex(
-      (item) => item.productId.toString() === productId
+      (item) => item.productId.toString() === productId.toString()
     );
     if (productIndex === -1) {
       return res.status(404).json({
@@ -259,10 +279,9 @@ export const increaseCartItemQuantity = async (req, res) => {
     }
 
     // Update cart items and total values
-    cart.totalPrice +=
-      cart.products[productIndex].price * cart.products[productIndex].quantity;
-    cart.totalItems += cart.products[productIndex].quantity;
     cart.products[productIndex].quantity++;
+    cart.totalPrice += product.price;
+    cart.totalItems += 1;
 
     // Save the updated cart and handle potential errors
     const savedCart = await cart.save();
@@ -273,10 +292,17 @@ export const increaseCartItemQuantity = async (req, res) => {
         message: "Failed to increase item quantity. Please try again later.",
       });
     }
+
+    const cartProducts = await getProductsForCartItems(savedCart, Product);
+    const sellers = await getSellersForProducts(cartProducts, Seller);
+    const users = await getUsersForSellers(sellers, User);
+
+    const formattedCart = returnFormattedCart(savedCart, cartProducts, users);
+
     res.status(200).json({
       success: true,
       message: "Item quantity increased successfully.",
-      cart: savedCart,
+      cart: formattedCart,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -285,12 +311,20 @@ export const increaseCartItemQuantity = async (req, res) => {
 
 export const decreaseCartItemQuantity = async (req, res) => {
   const { productId } = req.body;
+  // Validate input - Ensure productId is a string
+  if (!productId || typeof productId !== "string") {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid product ID. Please provide a valid string.",
+    });
+  }
+
   try {
-    // Validate input - Ensure productId is a string
-    if (!productId || typeof productId !== "string") {
-      return res.status(400).json({
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).json({
         success: false,
-        message: "Invalid product ID. Please provide a valid string.",
+        message: "Product not found.",
       });
     }
 
@@ -313,7 +347,7 @@ export const decreaseCartItemQuantity = async (req, res) => {
 
     // Find the product index and handle potential errors
     const productIndex = cart.products.findIndex(
-      (item) => item.productId.toString() === productId
+      (item) => item.productId.toString() === productId.toString()
     );
     if (productIndex === -1) {
       return res.status(404).json({
@@ -323,10 +357,9 @@ export const decreaseCartItemQuantity = async (req, res) => {
     }
 
     // Update cart items and total values
-    cart.totalPrice -=
-      cart.products[productIndex].price * cart.products[productIndex].quantity;
-    cart.totalItems -= cart.products[productIndex].quantity;
     cart.products[productIndex].quantity--;
+    cart.totalPrice -= product.price;
+    cart.totalItems -= 1;
 
     // Save the updated cart and handle potential errors
     const savedCart = await cart.save();
@@ -337,10 +370,17 @@ export const decreaseCartItemQuantity = async (req, res) => {
         message: "Failed to decrease item quantity. Please try again later.",
       });
     }
+
+    const cartProducts = await getProductsForCartItems(savedCart, Product);
+    const sellers = await getSellersForProducts(cartProducts, Seller);
+    const users = await getUsersForSellers(sellers, User);
+
+    const formattedCart = returnFormattedCart(savedCart, cartProducts, users);
+
     res.status(200).json({
       success: true,
       message: "Item quantity decreased successfully.",
-      cart: savedCart,
+      cart: formattedCart,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
