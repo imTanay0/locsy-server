@@ -1,7 +1,14 @@
 import Cart from "../models/CartModel.js";
 import Product from "../models/ProductModel.js";
-import Buyer from "../models/BuyerModel.js";
 import User from "../models/UserModel.js";
+import Buyer from "../models/BuyerModel.js";
+import Seller from "../models/SellerModel.js";
+import { getSellersForProducts } from "../utils/pruduct-utils/index.js";
+import { getUsersForSellers } from "../utils/seller-utils/index.js";
+import {
+  getProductsForCartItems,
+  returnFormattedCart,
+} from "../utils/cart-utils.js";
 
 export const createCart = async (req, res) => {
   const { productId } = req.body;
@@ -61,13 +68,18 @@ export const createCart = async (req, res) => {
       });
     }
 
+    const cartProducts = await getProductsForCartItems(newCart, Product);
+    const sellers = await getSellersForProducts(cartProducts, Seller);
+    const users = await getUsersForSellers(sellers, User);
+
+    const formattedCart = returnFormattedCart(cart, cartProducts, users);
+
     res.status(200).json({
       success: true,
       message: "Cart created successfully.",
-      cart: newCart,
+      cart: formattedCart,
     });
   } catch (error) {
-    console.error("Error creating cart:", error);
     res.status(500).json({
       success: false,
       message: "Internal server error. Please try again later.",
@@ -111,10 +123,8 @@ export const addCartItem = async (req, res) => {
 
     // Update cart items and total values
     if (existingProductIndex !== -1) {
-      console.log("product already exists");
       cart.products[existingProductIndex].quantity += 1;
     } else {
-      console.log("product not exists");
       cart.products.push({ productId, quantity: 1 });
     }
     cart.totalPrice += product.price;
@@ -129,10 +139,16 @@ export const addCartItem = async (req, res) => {
       });
     }
 
+    const cartProducts = await getProductsForCartItems(savedCart, Product);
+    const sellers = await getSellersForProducts(cartProducts, Seller);
+    const users = await getUsersForSellers(sellers, User);
+
+    const formattedCart = returnFormattedCart(cart, cartProducts, users);
+
     res.status(200).json({
       success: true,
       message: "Item added to cart successfully.",
-      cart: savedCart,
+      cart: formattedCart,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -355,7 +371,14 @@ export const getCart = async (req, res) => {
         message: "Cart not found for this user.",
       });
     }
-    res.status(200).json({ success: true, cart });
+
+    const cartProducts = await getProductsForCartItems(cart, Product);
+    const sellers = await getSellersForProducts(cartProducts, Seller);
+    const users = await getUsersForSellers(sellers, User);
+
+    const formattedCart = returnFormattedCart(cart, cartProducts, users);
+
+    res.status(200).json({ success: true, cart: formattedCart });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
