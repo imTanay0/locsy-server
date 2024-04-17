@@ -27,16 +27,29 @@ const orderSchema = new mongoose.Schema(
     },
     discountedOrderPrice: {
       type: Number,
-      required: true,
+      default: 0,
     },
     address: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Address",
+      street: {
+        type: String,
+      },
+      city: {
+        type: String,
+      },
+      state: {
+        type: String,
+      },
+      zipCode: {
+        type: String,
+      },
+      country: {
+        type: String,
+        default: "India",
+      },
     },
     orderStatus: {
       type: String,
-      enum: ["PENDING", "CANCELLED", "SHIPPED", "DELIVERED"],
-      default: "PENDING",
+      enum: ["Placed", "Paid", "Shipped", "Canceled", "Delivered"],
     },
     paymentId: {
       type: String,

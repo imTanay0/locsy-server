@@ -7,6 +7,7 @@ import bodyParser from "body-parser";
 import multer from "multer";
 import dotenv from "dotenv";
 import cloudinary from "cloudinary";
+import Stripe from "stripe";
 
 import userRoutes from "./routes/userRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
@@ -14,6 +15,7 @@ import sellerRoutes from "./routes/sellerRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import buyerRoutes from "./routes/buyerRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
 
 // CONFIG
 dotenv.config({ path: ".env" });
@@ -25,6 +27,9 @@ cloudinary.v2.config({
   api_key: process.env.CLOUDINARY_CLIENT_API,
   api_secret: process.env.CLOUDINARY_CLIENT_SECRET,
 });
+
+export const STRIPE = new Stripe(process.env.STRIPE_API_KEY);
+export const FRONTEND_URL = process.env.CORS_ORIGIN;
 
 // MIDDLEWARES
 app.use(
@@ -52,9 +57,8 @@ app.use("/api/v1/seller", sellerRoutes);
 app.use("/api/v1/product", productRoutes);
 app.use("/api/v1/buyer", buyerRoutes);
 app.use("/api/v1/cart", cartRoutes);
+app.use("/api/v1/order", orderRoutes);
 
-app.get("/", (req, res) =>
-  res.send(`Hello Users, visit here: ${process.env.CORS_ORIGIN}`)
-);
+app.get("/", (req, res) => res.send(`Hello Users`));
 
 export { app };
