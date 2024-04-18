@@ -4,6 +4,14 @@ import Address from "../models/AddressModel.js";
 import { STRIPE } from "../app.js";
 import { FRONTEND_URL } from "../app.js";
 
+
+export const stripeWebhookHandler = async (req, res) => {
+  console.log("WEBHOOK HIT");
+  console.log(req.body)
+
+  res.send("Webhook hit");
+}
+
 export const createCheckoutSession = async (req, res) => {
   const { orderedProducts, totalPrice, address } = req.body;
 
@@ -30,7 +38,7 @@ export const createCheckoutSession = async (req, res) => {
       };
     });
 
-    const newOrder = await Order.create({
+    const newOrder = new Order({
       buyerId: buyer._id,
       orderedProducts: products,
       totalPrice,
@@ -53,7 +61,7 @@ export const createCheckoutSession = async (req, res) => {
 
     const session = await createSessionData(
       lineItems,
-      newOrder._id,
+      newOrder._id.toString(),
       totalPrice
     );
 
@@ -65,6 +73,7 @@ export const createCheckoutSession = async (req, res) => {
       });
     }
 
+    await newOrder.save();
     res.status(200).json({ success: true, session: session.url });
   } catch (error) {
     console.log(error);
