@@ -34,7 +34,12 @@ export const createCheckoutSession = async (req, res) => {
       buyerId: buyer._id,
       orderedProducts: products,
       totalPrice,
-      address,
+      address: {
+        street: address.street,
+        city: address.city,
+        state: address.state,
+        zipCode: address.zipCode,
+      },
       orderStatus: "Placed",
     });
     if (!newOrder) {
@@ -49,9 +54,7 @@ export const createCheckoutSession = async (req, res) => {
     const session = await createSessionData(
       lineItems,
       newOrder._id,
-      totalPrice,
-      orderedProducts,
-      address
+      totalPrice
     );
 
     if (!session.url) {
@@ -85,13 +88,7 @@ const createLineItems = (orderedProducts) => {
   });
 };
 
-const createSessionData = async (
-  lineItems,
-  orderId,
-  totalPrice,
-  orderedProducts,
-  address
-) => {
+const createSessionData = async (lineItems, orderId, totalPrice) => {
   const sessionData = await STRIPE.checkout.sessions.create({
     line_items: lineItems,
     mode: "payment",
