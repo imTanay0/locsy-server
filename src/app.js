@@ -30,6 +30,7 @@ cloudinary.v2.config({
 
 export const STRIPE = new Stripe(process.env.STRIPE_API_KEY);
 export const FRONTEND_URL = process.env.CORS_ORIGIN;
+export const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
 
 // MIDDLEWARES
 app.use(
@@ -38,6 +39,7 @@ app.use(
     credentials: true,
   })
 );
+app.use("/api/v1/order/checkout/webhook", express.raw({ type: "*/*" }));
 
 // app.use(upload.single());
 app.use(express.json({ limit: "20mb" }));

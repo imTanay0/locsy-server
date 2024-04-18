@@ -1,16 +1,45 @@
 import Order from "../models/OrderModel.js";
 import Buyer from "../models/BuyerModel.js";
 import Address from "../models/AddressModel.js";
-import { STRIPE } from "../app.js";
+import { STRIPE, STRIPE_WEBHOOK_SECRET } from "../app.js";
 import { FRONTEND_URL } from "../app.js";
 
-
 export const stripeWebhookHandler = async (req, res) => {
-  console.log("WEBHOOK HIT");
-  console.log(req.body)
+  let event;
 
-  res.send("Webhook hit");
-}
+  try {
+    const sig = req.headers["stripe-signature"];
+    event = STRIPE.webhooks.constructEvent(
+      req.body,
+      sig,
+      STRIPE_WEBHOOK_SECRET
+    );
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, message: `Webhook Error: ${error.message}` });
+  }
+
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object;
+
+    const order = await Order.findById(session.metadata.orderId);
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    order.orderStatus = "Paid";
+    order.isPaymentDone = true;
+    await order.save();
+    res.json({
+      success: true,
+      message: "Payment successful",
+    });
+  }
+};
 
 export const createCheckoutSession = async (req, res) => {
   const { orderedProducts, totalPrice, address } = req.body;
@@ -49,6 +78,7 @@ export const createCheckoutSession = async (req, res) => {
         zipCode: address.zipCode,
       },
       orderStatus: "Placed",
+      isPaymentDone: false,
     });
     if (!newOrder) {
       return res.status(400).json({
