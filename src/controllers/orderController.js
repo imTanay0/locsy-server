@@ -1,8 +1,14 @@
 import Order from "../models/OrderModel.js";
 import Buyer from "../models/BuyerModel.js";
-import Address from "../models/AddressModel.js";
-import { STRIPE, STRIPE_WEBHOOK_SECRET } from "../app.js";
-import { FRONTEND_URL } from "../app.js";
+import Product from "../models/ProductModel.js";
+
+import { STRIPE, STRIPE_WEBHOOK_SECRET, FRONTEND_URL } from "../app.js";
+import {
+  createLineItems,
+  createSessionData,
+  formatOrder,
+  getProductsForOrders,
+} from "../utils/order-utils.js";
 
 export const stripeWebhookHandler = async (req, res) => {
   let event;
@@ -92,7 +98,8 @@ export const createCheckoutSession = async (req, res) => {
     const session = await createSessionData(
       lineItems,
       newOrder._id.toString(),
-      totalPrice
+      totalPrice,
+      FRONTEND_URL
     );
 
     if (!session.url) {
@@ -111,33 +118,30 @@ export const createCheckoutSession = async (req, res) => {
   }
 };
 
-const createLineItems = (orderedProducts) => {
-  return orderedProducts.map((product) => {
-    return {
-      price_data: {
-        currency: "INR",
-        product_data: {
-          name: product.productName,
-          description: product.productDescription,
-        },
-        unit_amount: product.price * 100,
-      },
-      quantity: product.quantity,
-    };
-  });
-};
+export const getOrdersForBuyer = async (req, res) => {
+  try {
+    const buyer = await Buyer.findOne({ userId: req.user._id });
+    if (!buyer) {
+      return res.status(404).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
 
-const createSessionData = async (lineItems, orderId, totalPrice) => {
-  const sessionData = await STRIPE.checkout.sessions.create({
-    line_items: lineItems,
-    mode: "payment",
-    metadata: {
-      orderId,
-      totalPrice,
-    },
-    success_url: `${FRONTEND_URL}/ordrer-status?success=true`,
-    cancel_url: `${FRONTEND_URL}/cart?canceled=true`,
-  });
+    const orders = await Order.find({ buyerId: buyer._id });
+    if (!orders || orders.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No orders found",
+      });
+    }
 
-  return sessionData;
+    const products = await getProductsForOrders(orders, Product);
+    const formatOrders = formatOrder(orders, products);
+
+    return res.status(200).json({ success: true, orders: formatOrders });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
