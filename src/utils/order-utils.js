@@ -56,6 +56,8 @@ export const getProductsForOrders = async (orders, Product) => {
 };
 
 export const formatOrder = (orders, products) => {
+  const date = new Date();
+
   const formatProducts = products.map((product) => ({
     productId: product._id,
     productName: product.productName,
@@ -72,6 +74,7 @@ export const formatOrder = (orders, products) => {
     totalPrice: order.totalPrice,
     orderStatus: order.orderStatus,
     products: formatProducts,
+    date: date.toLocaleDateString(),
   }));
 
   return data;
