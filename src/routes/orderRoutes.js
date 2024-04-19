@@ -2,6 +2,7 @@ import express from "express";
 
 import {
   createCheckoutSession,
+  getOrderById,
   getOrdersForBuyer,
   stripeWebhookHandler,
 } from "../controllers/orderController.js";
@@ -18,5 +19,7 @@ router.post(
 router.post("/checkout/webhook", stripeWebhookHandler);
 
 router.get("/get", isAuthenticated, getOrdersForBuyer);
+
+router.get("/:orderId",isAuthenticated, getOrderById);
 
 export default router;

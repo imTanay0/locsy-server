@@ -1,6 +1,7 @@
 import Order from "../models/OrderModel.js";
 import Buyer from "../models/BuyerModel.js";
 import Product from "../models/ProductModel.js";
+import User from "../models/UserModel.js";
 
 import { STRIPE, STRIPE_WEBHOOK_SECRET, FRONTEND_URL } from "../app.js";
 import {
@@ -140,6 +141,66 @@ export const getOrdersForBuyer = async (req, res) => {
     const formatOrders = formatOrder(orders, products);
 
     return res.status(200).json({ success: true, orders: formatOrders });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const getOrderById = async (req, res) => {
+  const { orderId } = req.params;
+  if (!orderId) {
+    return res.status(404).json({
+      success: false,
+      message: "Provide a valid Id",
+    });
+  }
+  try {
+    const buyer = await Buyer.findOne({ userId: req.user._id });
+    if (!buyer) {
+      return res.status(400).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
+    const order = await Order.findById(orderId);
+    if (!order || order.buyerId.toString() !== buyer._id.toString()) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    const productPromises = order.orderedProducts.map(
+      async (product) => await Product.findById(product.productId)
+    );
+    const products = await Promise.all(productPromises);
+
+    const formatProducts = products.map((product) => ({
+      productId: product._id,
+      productName: product.productName,
+      productImg: product.mainImage.image.url,
+      price: product.price,
+      stock: product.stock,
+      sellerId: product.sellerId._id,
+      quantity: order.orderedProducts.find(
+        (item) => item.productId.toString() === product._id.toString()
+      ).orderedQuantity,
+    }));
+
+    const date = new Date();
+    const formattedOrder = {
+      orderId: order._id,
+      address: order.address,
+      buyerId: order.buyerId,
+      totalPrice: order.totalPrice,
+      orderStatus: order.orderStatus,
+      products: formatProducts,
+      date: date.toLocaleDateString(),
+    };
+
+    res.status(200).json({ success: true, order: formattedOrder });
   } catch (error) {
     console.log(error);
     res.status(500).json({ success: false, message: error.message });
