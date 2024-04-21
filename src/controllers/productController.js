@@ -249,7 +249,7 @@ export const searchProducts = async (req, res) => {
   try {
     const fuseOptions = {
       shouldSort: true,
-      threshold: 0.3,
+      threshold: 0.4,
       location: 0,
       distance: 1000,
       maxPatternLength: 32,
