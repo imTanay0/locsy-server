@@ -1,10 +1,10 @@
 import cloudinary from "cloudinary";
-import { rm } from "fs";
+import Fuse from "fuse.js";
 
+import Category from "../models/CategoryModel.js";
 import Product from "../models/ProductModel.js";
 import Seller from "../models/SellerModel.js";
 import User from "../models/UserModel.js";
-import Category from "../models/CategoryModel.js";
 import getDataUri from "../utils/dataUri.js";
 import {
   getCategoriesForProducts,
@@ -237,36 +237,41 @@ export const getLatestProducts = async (req, res) => {
 };
 
 export const searchProducts = async (req, res) => {
-  try {
-    const { query } = req.query;
+  const { productName } = req.query;
 
-    // Search for categories
-    const categoryResults = await Category.find({
-      category: { $regex: new RegExp(query, "i") },
+  if (productName === " " || productName === "") {
+    return res.status(404).json({
+      success: false,
+      message: "No products found",
     });
+  }
 
-    if (!categoryResults || categoryResults.length === 0) {
+  try {
+    const fuseOptions = {
+      shouldSort: true,
+      threshold: 0.3,
+      location: 0,
+      distance: 1000,
+      maxPatternLength: 32,
+      minMatchCharLength: 1,
+      keys: ["productName", "name"],
+    };
+
+    const products = await Product.find({});
+
+    const fuse = new Fuse(products, fuseOptions);
+    const searchedList = fuse.search(productName);
+
+    if (!searchedList || searchedList.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "Category not found",
+        message: "No products found",
       });
     }
 
-    // Extract category IDs from results
-    const categoryIds = categoryResults.map((category) => category._id);
-
-    // Search for products by product name or related to the found categories
-    const productResults = await Product.find({
-      $or: [
-        { productName: { $regex: new RegExp(query, "i") } },
-        { categories: { $in: categoryIds } },
-      ],
-    });
-
     res.status(200).json({
       success: true,
-      productResults,
-      categoryResults,
+      searchedList,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -287,8 +292,6 @@ export const getProductByCategory = async (req, res) => {
         message: "Category not found",
       });
     }
-
-    // console.log(categoryResults);
 
     let categoryIds;
 
@@ -383,9 +386,16 @@ export const deleteProduct = async (req, res) => {
       });
     }
 
-    rm(product.mainImage.image.url, () => {
-      console.log("Product Photo Deleted");
-    });
+    const { result } = await cloudinary.v2.uploader.destroy(
+      product.mainImage.image.public_id
+    );
+
+    if (result !== "ok") {
+      return res.status(400).json({
+        success: false,
+        message: "Failed to delete image",
+      });
+    }
 
     await product.deleteOne();
 

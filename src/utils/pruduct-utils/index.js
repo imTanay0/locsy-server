@@ -37,7 +37,6 @@ export const getSellersForProducts = async (products, Seller) => {
 //   }
 // };
 
-
 export const getCategoriesForProducts = async (products, Category) => {
   try {
     const categoryPromises = products.map(async (product) => {
@@ -55,4 +54,8 @@ export const getCategoriesForProducts = async (products, Category) => {
     console.error(error);
     throw error;
   }
+};
+
+export const escapeRegex = (text) => {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
 };
