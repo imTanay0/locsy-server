@@ -381,7 +381,6 @@ export const updateProduct = async (req, res) => {
 export const deleteProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
-
     if (!product) {
       return res.status(404).json({
         success: false,
@@ -406,6 +405,108 @@ export const deleteProduct = async (req, res) => {
       success: true,
       message: "Product Deleted Successfully",
       product,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const filterProducts = async (req, res) => {
+  const { sort, maxPrice } = req.query;
+
+  if (!sort && !maxPrice) {
+    return res.status(400).json({
+      success: false,
+      message: "Please provide at least one filter",
+    });
+  }
+
+  try {
+    if (sort && !maxPrice) {
+      if (sort === "asc") {
+        const products = await Product.find().sort({ price: 1 });
+
+        if (products.length === 0) {
+          res.status(404).json({
+            success: false,
+            message: "No products found",
+          });
+        }
+
+        return res.status(200).json({
+          success: true,
+          products,
+        });
+      } else if (sort === "dsc") {
+        const products = await Product.find().sort({ price: -1 });
+
+        if (products.length === 0) {
+          res.status(404).json({
+            success: false,
+            message: "No products found",
+          });
+        }
+
+        return res.status(200).json({
+          success: true,
+          products,
+        });
+      }
+    }
+
+    if (maxPrice && !sort) {
+      const products = await Product.find({ price: { $lte: maxPrice } });
+
+      if (products.length === 0) {
+        res.status(404).json({
+          success: false,
+          message: "No products found",
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        products,
+      });
+    }
+
+    if (sort === "asc" && maxPrice) {
+      const products = await Product.find({
+        price: { $lte: maxPrice },
+      }).sort({ price: 1 });
+
+      if (products.length === 0) {
+        res.status(404).json({
+          success: false,
+          message: "No products found",
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        products,
+      });
+    } else if (sort === "dsc" && maxPrice) {
+      const products = await Product.find({
+        price: { $lte: maxPrice },
+      }).sort({ price: -1 });
+
+      if (products.length === 0) {
+        res.status(404).json({
+          success: false,
+          message: "No products found",
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        products,
+      });
+    }
+
+    res.status(404).json({
+      success: false,
+      message: "No products found",
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

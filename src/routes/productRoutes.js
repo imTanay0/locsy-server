@@ -10,6 +10,7 @@ import {
   getProductById,
   updateProduct,
   deleteProduct,
+  filterProducts,
 } from "../controllers/productController.js";
 import { isAuthenticated, isSeller } from "../middlewares/auth.js";
 import singleUpload from "../middlewares/multer.js";
@@ -27,6 +28,8 @@ router.get("/latest", getLatestProducts);
 router.get("/search", searchProducts);
 
 router.get("/search/:category", getProductByCategory);
+
+router.get("/filter", filterProducts);
 
 router
   .route("/:id")
