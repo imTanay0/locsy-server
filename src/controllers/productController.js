@@ -155,7 +155,6 @@ export const getAllProducts = async (req, res) => {
     const categories = await getCategoriesForProducts(products, Category);
 
     const updatedProducts = products.map((product, idx) => {
-      // Ensure users and sellers are arrays
       if (
         !Array.isArray(users) ||
         !Array.isArray(sellers) ||
@@ -166,20 +165,15 @@ export const getAllProducts = async (req, res) => {
         return null;
       }
 
-      // Find the seller corresponding to the product
       const seller = sellers.find(
         (seller) => seller._id.toString() === product.sellerId.toString()
       );
 
-      // Find the user corresponding to the seller
       const user = users.find(
         (u) => u._id.toString() === seller.userId.toString()
       );
 
-      // Find the categories corresponding to the product
       const productCategories = categories[idx].map((cat) => cat.category);
-
-      // console.log("productCategories: ", productCategories);
 
       if (!seller || !user) {
         console.error("Seller or user not found for product: ", product._id);
@@ -201,12 +195,9 @@ export const getAllProducts = async (req, res) => {
       };
     });
 
-    // Filter out null values in case of errors
     const filteredUpdatedProducts = updatedProducts.filter(
       (product) => product !== null
     );
-
-    // console.log(filteredUpdatedProducts);
 
     res.status(200).json({
       success: true,
@@ -411,6 +402,142 @@ export const deleteProduct = async (req, res) => {
   }
 };
 
+// export const filterProducts = async (req, res) => {
+//   const { sort, maxPrice } = req.query;
+
+//   if (!sort && !maxPrice) {
+//     return res.status(400).json({
+//       success: false,
+//       message: "Please provide at least one filter",
+//     });
+//   }
+
+//   try {
+//     let products;
+
+//     if (sort && !maxPrice) {
+//       if (sort === "asc") {
+//         products = await Product.find().sort({ price: 1 });
+
+//         if (!products || products.length === 0) {
+//           res.status(404).json({
+//             success: false,
+//             message: "No products found",
+//           });
+//         }
+//       } else if (sort === "dsc") {
+//         products = await Product.find().sort({ price: -1 });
+
+//         if (!products || products.length === 0) {
+//           res.status(404).json({
+//             success: false,
+//             message: "No products found",
+//           });
+//         }
+//       }
+//     }
+
+//     if (maxPrice && !sort) {
+//       products = await Product.find({ price: { $lte: maxPrice } });
+
+//       if (!products || products.length === 0) {
+//         res.status(404).json({
+//           success: false,
+//           message: "No products found",
+//         });
+//       }
+//     }
+
+//     if (sort === "asc" && maxPrice) {
+//       products = await Product.find({
+//         price: { $lte: maxPrice },
+//       }).sort({ price: 1 });
+
+//       if (!products || products.length === 0) {
+//         res.status(404).json({
+//           success: false,
+//           message: "No products found",
+//         });
+//       }
+//     } else if (sort === "dsc" && maxPrice) {
+//       products = await Product.find({
+//         price: { $lte: maxPrice },
+//       }).sort({ price: -1 });
+
+//       if (!products || products.length === 0) {
+//         res.status(404).json({
+//           success: false,
+//           message: "No products found",
+//         });
+//       }
+//     }
+
+//     if (!products || products.length === 0) {
+//       res.status(404).json({
+//         success: false,
+//         message: "No products found",
+//       });
+//     }
+
+//     const sellers = await getSellersForProducts(products, Seller);
+//     const users = await getUsersForSellers(sellers, User);
+//     const categories = await getCategoriesForProducts(products, Category);
+
+//     const updatedProducts = products.map((product, idx) => {
+//       if (
+//         !Array.isArray(users) ||
+//         !Array.isArray(sellers) ||
+//         !Array.isArray(categories) ||
+//         !Array.isArray(categories[idx])
+//       ) {
+//         console.error("Invalid users, sellers, or categories data");
+//         return null;
+//       }
+
+//       const seller = sellers.find(
+//         (seller) => seller._id.toString() === product.sellerId.toString()
+//       );
+
+//       const user = users.find(
+//         (u) => u._id.toString() === seller.userId.toString()
+//       );
+
+//       const productCategories = categories[idx].map((cat) => cat.category);
+
+//       if (!seller || !user) {
+//         console.error("Seller or user not found for product: ", product._id);
+//         return null;
+//       }
+
+//       return {
+//         productId: product._id,
+//         productName: product.productName,
+//         productDescription: product.productDescription,
+//         productImage: product.mainImage.image.url,
+//         price: product.price,
+//         offerPrice: product.offerPrice,
+//         sellerName: `${user.fname} ${user.lname}`,
+//         productCategories,
+//         stock: product.stock,
+//         createdAt: product.createdAt,
+//         updatedAt: product.updatedAt,
+//       };
+//     });
+
+//     const filteredUpdatedProducts = updatedProducts.filter(
+//       (product) => product !== null
+//     );
+
+//     res.status(200).json({
+//       success: true,
+//       products: filteredUpdatedProducts,
+//     });
+
+//   } catch (error) {
+//     res.status(500).json({ success: false, message: error.message });
+//   }
+// };
+
 export const filterProducts = async (req, res) => {
   const { sort, maxPrice } = req.query;
 
@@ -422,93 +549,46 @@ export const filterProducts = async (req, res) => {
   }
 
   try {
-    if (sort && !maxPrice) {
-      if (sort === "asc") {
-        const products = await Product.find().sort({ price: 1 });
+    let products;
 
-        if (products.length === 0) {
-          res.status(404).json({
-            success: false,
-            message: "No products found",
-          });
-        }
-
-        return res.status(200).json({
-          success: true,
-          products,
-        });
-      } else if (sort === "dsc") {
-        const products = await Product.find().sort({ price: -1 });
-
-        if (products.length === 0) {
-          res.status(404).json({
-            success: false,
-            message: "No products found",
-          });
-        }
-
-        return res.status(200).json({
-          success: true,
-          products,
-        });
-      }
-    }
-
-    if (maxPrice && !sort) {
-      const products = await Product.find({ price: { $lte: maxPrice } });
-
-      if (products.length === 0) {
-        res.status(404).json({
-          success: false,
-          message: "No products found",
-        });
-      }
-
-      return res.status(200).json({
-        success: true,
-        products,
-      });
-    }
-
-    if (sort === "asc" && maxPrice) {
-      const products = await Product.find({
+    if (maxPrice) {
+      products = await Product.find({
         price: { $lte: maxPrice },
-      }).sort({ price: 1 });
-
-      if (products.length === 0) {
-        res.status(404).json({
-          success: false,
-          message: "No products found",
-        });
-      }
-
-      return res.status(200).json({
-        success: true,
-        products,
-      });
-    } else if (sort === "dsc" && maxPrice) {
-      const products = await Product.find({
-        price: { $lte: maxPrice },
-      }).sort({ price: -1 });
-
-      if (products.length === 0) {
-        res.status(404).json({
-          success: false,
-          message: "No products found",
-        });
-      }
-
-      return res.status(200).json({
-        success: true,
-        products,
-      });
+      }).sort({ price: sort === "asc" ? 1 : -1 });
+    } else {
+      products = await Product.find().sort({ price: sort === "asc" ? 1 : -1 });
     }
 
-    res.status(404).json({
-      success: false,
-      message: "No products found",
-    });
+    if (!products || products.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No products found" });
+    }
+
+    const sellers = await getSellersForProducts(products, Seller);
+    const users = await getUsersForSellers(sellers, User);
+    const categories = await getCategoriesForProducts(products, Category);
+
+    const updatedProducts = products.map((product, idx) => ({
+      productId: product._id,
+      productName: product.productName,
+      productDescription: product.productDescription,
+      productImage: product.mainImage.image.url,
+      price: product.price,
+      offerPrice: product.offerPrice,
+      sellerName: users[idx].fname + " " + users[idx].lname,
+      productCategories: categories?.[idx]?.map((cat) => cat.category),
+      stock: product.stock,
+      createdAt: product.createdAt,
+      updatedAt: product.updatedAt,
+    }));
+
+    const filteredUpdatedProducts = updatedProducts.filter(
+      (product) => product !== null
+    );
+
+    res.status(200).json({ success: true, products: filteredUpdatedProducts });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
