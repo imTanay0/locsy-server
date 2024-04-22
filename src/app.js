@@ -16,6 +16,7 @@ import productRoutes from "./routes/productRoutes.js";
 import buyerRoutes from "./routes/buyerRoutes.js";
 import cartRoutes from "./routes/cartRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import addressRouter from "./routes/addressRoutes.js";
 
 // CONFIG
 dotenv.config({ path: ".env" });
@@ -60,6 +61,7 @@ app.use("/api/v1/product", productRoutes);
 app.use("/api/v1/buyer", buyerRoutes);
 app.use("/api/v1/cart", cartRoutes);
 app.use("/api/v1/order", orderRoutes);
+app.use("/api/v1/address", addressRouter);
 
 app.get("/", (req, res) => res.send(`Hello Users`));
 

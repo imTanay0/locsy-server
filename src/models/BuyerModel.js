@@ -8,12 +8,13 @@ const buyerSchema = new mongoose.Schema(
     },
     addresses: [
       {
-        address: {
+        addressId: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Address",
         },
         isDefault: {
           type: Boolean,
+          default: false,
         },
       },
     ],
