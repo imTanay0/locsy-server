@@ -41,6 +41,7 @@ export const addAddress = async (req, res) => {
       success: true,
       message: "Address added successfully",
       address: newAddress,
+      contactNo,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -97,7 +98,10 @@ export const getAllAddressForBuyer = async (req, res) => {
     const addresses = await Address.find({
       _id: { $in: buyer.addresses.map((address) => address.addressId) },
     });
-    res.status(200).json({ success: true, addresses });
+
+    const contactNo = buyer.addresses.map((address) => address.contactNo);
+
+    res.status(200).json({ success: true, addresses, contactNo });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
