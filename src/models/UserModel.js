@@ -28,26 +28,7 @@ const userSchema = new mongoose.Schema(
     },
     contactNo: {
       type: String,
-      // default: "0",
     },
-    // address: {
-    //   street: {
-    //     type: String,
-    //   },
-    //   city: {
-    //     type: String,
-    //   },
-    //   state: {
-    //     type: String,
-    //   },
-    //   zipCode: {
-    //     type: String,
-    //   },
-    //   country: {
-    //     type: String,
-    //     default: "India",
-    //   },
-    // },
     role: {
       type: Number,
       enum: [1, 2, 3], // 1 -> Admin, 2 -> Seller, 3 -> Buyer

@@ -16,6 +16,9 @@ const buyerSchema = new mongoose.Schema(
           type: Boolean,
           default: false,
         },
+        contactNo: {
+          type: String,
+        },
       },
     ],
   },

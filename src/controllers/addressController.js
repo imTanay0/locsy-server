@@ -13,14 +13,6 @@ export const addAddress = async (req, res) => {
   }
 
   try {
-    const user = await User.findById(req.user._id);
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "Invalid user",
-      });
-    }
-
     const buyer = await Buyer.findOne({ userId: req.user._id });
     if (!buyer) {
       return res.status(404).json({
@@ -42,10 +34,7 @@ export const addAddress = async (req, res) => {
       });
     }
 
-    user.contactNo = contactNo;
-    await user.save();
-
-    buyer.addresses.push({ addressId: newAddress._id });
+    buyer.addresses.push({ addressId: newAddress._id, contactNo: contactNo });
     await buyer.save();
 
     res.status(201).json({
