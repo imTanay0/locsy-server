@@ -7,6 +7,7 @@ import Seller from "../models/SellerModel.js";
 import User from "../models/UserModel.js";
 import getDataUri from "../utils/dataUri.js";
 import {
+  formatSearchedProducts,
   getCategoriesForProducts,
   getSellersForProducts,
 } from "../utils/pruduct-utils/index.js";
@@ -269,9 +270,11 @@ export const searchProducts = async (req, res) => {
       });
     }
 
+    const formattedProducts = formatSearchedProducts(searchedList);
+
     res.status(200).json({
       success: true,
-      searchedList,
+      products: formattedProducts,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

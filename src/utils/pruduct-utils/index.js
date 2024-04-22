@@ -56,6 +56,16 @@ export const getCategoriesForProducts = async (products, Category) => {
   }
 };
 
+export const formatSearchedProducts = (searchedList) => {
+  const data = searchedList.map((item) => ({
+    productId: item.item._id,
+    productName: item.item.productName,
+    price: item.item.price,
+  }));
+
+  return data;
+};
+
 export const escapeRegex = (text) => {
   return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
 };
