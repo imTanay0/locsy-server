@@ -123,7 +123,13 @@ export const getSellerForOrders = async (orders, Order, seller, products) => {
     });
 
     const data = sellerIds.map((item, i) => ({
-      orderId: orders[i]._id,
+      order: {
+        orderId: orders[i]._id,
+        totalPrice: orders[i].totalPrice,
+        orderStatus: orders[i].orderStatus,
+        isPaymentDone: orders[i].isPaymentDone,
+        date: orders[i].createdAt.toLocaleDateString(),
+      },
       sellerId: item[0],
       products:
         selledProducts[i].products[0] &&

@@ -220,14 +220,19 @@ export const getOrdersForSellers = async (req, res) => {
       });
     }
 
-    const orders = await Order.find();
+    const orders = await Order.find().sort({ createdAt: -1 });
 
     const products = await getProductsForOrders(orders, Product);
-    const sellersId = await getSellerForOrders(orders, Order, seller, products);
+    const updattedOrders = await getSellerForOrders(
+      orders,
+      Order,
+      seller,
+      products
+    );
 
     res.status(200).json({
       success: true,
-      orders: sellersId,
+      orders: updattedOrders,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
