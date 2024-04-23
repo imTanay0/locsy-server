@@ -129,7 +129,9 @@ export const getOrdersForBuyer = async (req, res) => {
       });
     }
 
-    const orders = await Order.find({ buyerId: buyer._id });
+    const orders = await Order.find({ buyerId: buyer._id }).sort({
+      createdAt: -1,
+    });
     if (!orders || orders.length === 0) {
       return res.status(404).json({
         success: false,

@@ -29,8 +29,8 @@ export const createSessionData = async (
       orderId,
       totalPrice,
     },
-    success_url: `${FRONTEND_URL}/ordrer-status?success=true`,
-    cancel_url: `${FRONTEND_URL}/cart?canceled=true`,
+    success_url: `${FRONTEND_URL}/orders/${orderId}`,
+    cancel_url: `${FRONTEND_URL}/cart`,
   });
 
   return sessionData;
