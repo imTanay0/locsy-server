@@ -1,3 +1,5 @@
+import { STRIPE } from "../app.js";
+
 export const createLineItems = (orderedProducts) => {
   return orderedProducts.map((product) => {
     return {
@@ -38,14 +40,15 @@ export const getProductsForOrders = async (orders, Product) => {
   try {
     const orderedProducts = orders.map((order) => order.orderedProducts);
 
-    const orderedProductsFlat = orderedProducts.flat();
+    const productPromises = orderedProducts.map(async (perOrder, idx) => {
+      const dataPromises = perOrder.map(
+        async (product) =>
+          await Product.findById(product.productId).populate("sellerId")
+      );
 
-    const productPromises = orderedProductsFlat.map(
-      async (product) =>
-        await Product.findById(product.productId).populate("sellerId")
-    );
+      return await Promise.all(dataPromises);
+    });
 
-    // Wait for all promises to resolve using Promise.all
     const products = await Promise.all(productPromises);
 
     return products;
@@ -56,16 +59,18 @@ export const getProductsForOrders = async (orders, Product) => {
 };
 
 export const formatOrder = (orders, products) => {
-  const date = new Date();
+  const resolve2D = products.map((product1D) => {
+    const formatProducts = product1D.map((product) => ({
+      productId: product._id,
+      productName: product.productName,
+      productImg: product.mainImage.image.url,
+      price: product.price,
+      stock: product.stock,
+      sellerId: product.sellerId._id,
+    }));
 
-  const formatProducts = products.map((product) => ({
-    productId: product._id,
-    productName: product.productName,
-    productImg: product.mainImage.image.url,
-    price: product.price,
-    stock: product.stock,
-    sellerId: product.sellerId._id,
-  }));
+    return formatProducts;
+  });
 
   const data = orders.map((order, idx) => ({
     orderId: order._id,
@@ -73,8 +78,8 @@ export const formatOrder = (orders, products) => {
     buyerId: order.buyerId,
     totalPrice: order.totalPrice,
     orderStatus: order.orderStatus,
-    products: formatProducts,
-    date: date.toLocaleDateString(),
+    products: resolve2D[idx],
+    date: order.createdAt.toLocaleDateString(),
   }));
 
   return data;
