@@ -1,14 +1,15 @@
-import Order from "../models/OrderModel.js";
 import Buyer from "../models/BuyerModel.js";
+import Order from "../models/OrderModel.js";
 import Product from "../models/ProductModel.js";
-import User from "../models/UserModel.js";
+import Seller from "../models/SellerModel.js";
 
-import { STRIPE, STRIPE_WEBHOOK_SECRET, FRONTEND_URL } from "../app.js";
+import { FRONTEND_URL, STRIPE, STRIPE_WEBHOOK_SECRET } from "../app.js";
 import {
   createLineItems,
   createSessionData,
   formatOrder,
   getProductsForOrders,
+  getSellerForOrders,
 } from "../utils/order-utils.js";
 
 export const stripeWebhookHandler = async (req, res) => {
@@ -205,6 +206,30 @@ export const getOrderById = async (req, res) => {
     res.status(200).json({ success: true, order: formattedOrder });
   } catch (error) {
     console.log(error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const getOrdersForSellers = async (req, res) => {
+  try {
+    const seller = await Seller.findById(req.seller._id);
+    if (!seller) {
+      return res.status(404).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
+    const orders = await Order.find();
+
+    const products = await getProductsForOrders(orders, Product);
+    const sellersId = await getSellerForOrders(orders, Order, seller, products);
+
+    res.status(200).json({
+      success: true,
+      orders: sellersId,
+    });
+  } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };

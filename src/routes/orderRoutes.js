@@ -4,9 +4,10 @@ import {
   createCheckoutSession,
   getOrderById,
   getOrdersForBuyer,
+  getOrdersForSellers,
   stripeWebhookHandler,
 } from "../controllers/orderController.js";
-import { isAuthenticated } from "../middlewares/auth.js";
+import { isAuthenticated, isSeller } from "../middlewares/auth.js";
 
 const router = express.Router();
 
@@ -20,6 +21,8 @@ router.post("/checkout/webhook", stripeWebhookHandler);
 
 router.get("/get", isAuthenticated, getOrdersForBuyer);
 
-router.get("/:orderId",isAuthenticated, getOrderById);
+router.get("/seller", isSeller, getOrdersForSellers);
+
+router.route("/:orderId").get(isAuthenticated, getOrderById);
 
 export default router;

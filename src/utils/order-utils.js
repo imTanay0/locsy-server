@@ -84,3 +84,64 @@ export const formatOrder = (orders, products) => {
 
   return data;
 };
+
+export const getSellerForOrders = async (orders, Order, seller, products) => {
+  try {
+    const orderDetailsPromises = orders.map(async (order) => {
+      return await Order.findById(order._id).populate(
+        "orderedProducts.productId"
+      );
+    });
+
+    const orderDetails = await Promise.all(orderDetailsPromises);
+
+    const sellersPromises = orderDetails.map(
+      async (orderDetail) =>
+        await orderDetail.populate("orderedProducts.productId.sellerId")
+    );
+
+    const ordersWithSellers = await Promise.all(sellersPromises);
+
+    const sellersIds2d = ordersWithSellers.map((order, i) => {
+      const data = order.orderedProducts.map((item) => item.productId.sellerId);
+      return data.map((item) => item._id);
+    });
+
+    const sellerIds = sellersIds2d.map((arr2d) => {
+      return arr2d.filter((arr) => seller._id.toString() === arr.toString());
+    });
+
+    const selledProducts = orderDetails.map((order, i) => {
+      const products = order.orderedProducts.filter(
+        (item) =>
+          item.productId.sellerId._id.toString() === seller._id.toString()
+      );
+      return {
+        products,
+        i,
+      };
+    });
+
+    const data = sellerIds.map((item, i) => ({
+      orderId: orders[i]._id,
+      sellerId: item[0],
+      products:
+        selledProducts[i].products[0] &&
+        selledProducts[i].products.map((product) => {
+          return {
+            productId: product.productId._id,
+            productName: product.productId.productName,
+            productImg: product.productId.mainImage.image.url,
+            price: product.productId.price,
+            stock: product.productId.stock,
+          };
+        }),
+    }));
+
+    const result = data.filter((item) => item.sellerId);
+    return result;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
