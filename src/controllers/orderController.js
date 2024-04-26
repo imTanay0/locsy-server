@@ -221,6 +221,74 @@ export const getOrdersForSellers = async (req, res) => {
     }
 
     const orders = await Order.find().sort({ createdAt: -1 });
+    if (!orders || orders.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Orders not found.",
+      });
+    }
+
+    const products = await getProductsForOrders(orders, Product);
+    const updattedOrders = await getSellerForOrders(
+      orders,
+      Order,
+      seller,
+      products
+    );
+
+    res.status(200).json({
+      success: true,
+      orders: updattedOrders,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const updateOrderStatus = async (req, res) => {
+  const { orderId, orderStatus } = req.body;
+
+  if (!orderId || !orderStatus) {
+    return res.status(400).json({
+      success: true,
+      message: "Provide a valid Id and Order Status",
+    });
+  }
+
+  try {
+    const seller = await Seller.findById(req.seller._id);
+    if (!seller) {
+      return res.status(404).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+    }
+
+    if (order.orderStatus === "Delivered") {
+      return res.status(400).json({
+        success: false,
+        message: "Order already delivered",
+      });
+    }
+
+    order.orderStatus = orderStatus;
+    await order.save();
+
+    const orders = await Order.find().sort({ createdAt: -1 });
+    if (!orders || orders.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Orders not found.",
+      });
+    }
 
     const products = await getProductsForOrders(orders, Product);
     const updattedOrders = await getSellerForOrders(
