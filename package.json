@@ -5,9 +5,10 @@
   "type": "module",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
+    "start": "concurrently \"node src/index.js\" \"npm run stripe2\"",
     "dev": "concurrently \"nodemon src/index.js\" \"npm run stripe\"",
-    "stripe": "stripe listen --forward-to localhost:8000/api/v1/order/checkout/webhook"
+    "stripe": "stripe listen --forward-to localhost:8000/api/v1/order/checkout/webhook",
+    "stripe2": "stripe listen --forward-to https://locsy-server.onrender.com/api/v1/order/checkout/webhook"
   },
   "author": "Tanay Bhowal",
   "license": "ISC",
