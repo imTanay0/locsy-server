@@ -68,6 +68,22 @@ export const createCheckoutSession = async (req, res) => {
       });
     }
 
+    orderedProducts.forEach(async (product) => {
+      const productData = await Product.findById(product.productId);
+      if (productData.stock < product.quantity) {
+        return res.status(400).json({
+          success: false,
+          message: "Insufficient stock",
+        });
+      }
+    });
+
+    orderedProducts.forEach(async (product) => {
+      const productData = await Product.findById(product.productId);
+      productData.stock -= product.quantity;
+      await productData.save();
+    });
+
     const products = orderedProducts.map((product) => {
       return {
         productId: product.productId,
