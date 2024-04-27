@@ -15,18 +15,18 @@ export const getProductsForCartItems = async (cart, Product) => {
 };
 
 export const returnFormattedCart = (cart, cartProducts, users) => {
-  const formattedCartProducts = cartProducts.map((cartProducts, i) => ({
-    productId: cartProducts._id,
-    productName: cartProducts.productName,
-    productDescription: cartProducts.productDescription,
-    price: cartProducts.price,
-    stock: cartProducts.stock,
+  const formattedCartProducts = cartProducts.map((cartProduct, i) => ({
+    productId: cartProduct._id,
+    productName: cartProduct.productName,
+    productDescription: cartProduct.productDescription,
+    price: cartProduct.price,
+    stock: cartProduct.stock,
     quantity: cart.products[i].quantity,
-    ProductImage: cartProducts.mainImage.image,
-    category: cartProducts.category,
+    ProductImage: cartProduct.mainImage.image,
+    category: cartProduct.category,
     sellerName: `${users[i].fname} ${users[i].lname}`,
-    createdAt: cartProducts.createdAt,
-    updatedAt: cartProducts.updatedAt,
+    createdAt: cartProduct.createdAt,
+    updatedAt: cartProduct.updatedAt,
   }));
 
   const formattedCart = {

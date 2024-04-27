@@ -31,10 +31,10 @@ export const createCart = async (req, res) => {
     }
 
     const product = await Product.findById(productId);
-    if (!product) {
+    if (!product || product.stock <= 0) {
       return res.status(404).json({
         success: false,
-        message: "Product not found.",
+        message: "Product not found or out of stock.",
       });
     }
 
@@ -92,10 +92,10 @@ export const addCartItem = async (req, res) => {
 
   try {
     const product = await Product.findById(productId);
-    if (!product) {
+    if (!product || product.stock <= 0) {
       return res.status(404).json({
         success: false,
-        message: "Product not found.",
+        message: "Product not found or out of stock.",
       });
     }
 
