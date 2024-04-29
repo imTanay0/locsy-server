@@ -11,6 +11,7 @@ import {
   updateProduct,
   deleteProduct,
   filterProducts,
+  getHomePageProducts,
 } from "../controllers/productController.js";
 import { isAuthenticated, isSeller } from "../middlewares/auth.js";
 import singleUpload from "../middlewares/multer.js";
@@ -24,6 +25,8 @@ router.get("/get", isSeller, getSellerProducts);
 router.get("/getall", getAllProducts);
 
 router.get("/latest", getLatestProducts);
+
+router.get("/home-products", getHomePageProducts);
 
 router.get("/search", searchProducts);
 
