@@ -1,15 +1,15 @@
 import express from "express";
 
 import {
-  registerSeller,
+  deleteLoggedInSeller,
+  getSeller,
   loginSeller,
   logoutSeller,
-  getSeller,
-  deleteLoggedInSeller,
-  testDeleteImage,
+  registerSeller,
+  updateSeller,
 } from "../controllers/sellerController.js";
-import singleUpload from "./../middlewares/multer.js";
 import { isAuthenticated } from "./../middlewares/auth.js";
+import singleUpload from "./../middlewares/multer.js";
 
 const router = express.Router();
 
@@ -23,6 +23,8 @@ router.get("/", isAuthenticated, getSeller);
 
 router.delete("/delete", isAuthenticated, deleteLoggedInSeller);
 
-router.delete("/delimage", testDeleteImage);
+router.put("/update", singleUpload, isAuthenticated, updateSeller);
+
+// router.delete("/delimage", testDeleteImage);
 
 export default router;

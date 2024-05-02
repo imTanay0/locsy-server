@@ -269,6 +269,7 @@ export const updateBuyer = async (req, res) => {
       success: true,
       user,
       role: buyer,
+      message: "Profile updated successfully",
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

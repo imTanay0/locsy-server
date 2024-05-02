@@ -265,27 +265,118 @@ export const deleteLoggedInSeller = async (req, res) => {
   }
 };
 
-export const testDeleteImage = async (req, res) => {
-  try {
-    const { result } = await cloudinary.v2.uploader.destroy(
-      "mb5sovfhuzvvp9irjipn"
-    );
+export const updateSeller = async (req, res) => {
+  const {
+    fname,
+    lname,
+    email,
+    contactNo,
+    street,
+    city,
+    state,
+    zipCode,
+    shopName,
+    shopDescription,
+  } = req.body;
 
-    console.log(result);
+  const file = req.file;
+
+  if (
+    !fname &&
+    !lname &&
+    !email &&
+    !contactNo &&
+    !street &&
+    !city &&
+    !state &&
+    !zipCode &&
+    !shopName &&
+    !shopDescription &&
+    !file
+  ) {
+    return res.status(400).json({
+      success: false,
+      message: "Please fill in the required fields",
+    });
+  }
+
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user || user.role !== 2) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
+    const seller = await Seller.findOne({ userId: user._id });
+    if (!seller) {
+      return res.status(404).json({
+        success: false,
+        message: "Seller not found",
+      });
+    }
+
+    if (fname) user.fname = fname;
+    if (lname) user.lname = lname;
+    if (email) user.email = email;
+    if (contactNo) user.contactNo = contactNo;
+    if (shopName) seller.shopName = shopName;
+    if (shopDescription) seller.shopDescription = shopDescription;
+    if (street || city || state || zipCode) {
+      seller.shopAddress = {
+        street: street,
+        city: city,
+        state: state,
+        zipCode: zipCode,
+      };
+    }
+
+    if (file) {
+      await cloudinary.v2.uploader.destroy(seller.shopImage.public_id);
+
+      const fileUri = getDataUri(file);
+      const mycloud = await cloudinary.v2.uploader.upload(fileUri.content);
+
+      seller.shopImage = {
+        public_id: mycloud.public_id,
+        url: mycloud.secure_url,
+      };
+    }
+
+    await user.save();
+    await seller.save();
 
     res.status(200).json({
       success: true,
+      user,
+      role: seller,
+      message: "Profile updated successfully",
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
+// export const testDeleteImage = async (req, res) => {
+//   try {
+//     const { result } = await cloudinary.v2.uploader.destroy(
+//       "mb5sovfhuzvvp9irjipn"
+//     );
+
+//     console.log(result);
+
+//     res.status(200).json({
+//       success: true,
+//     });
+//   } catch (error) {
+//     res.status(500).json({ success: false, message: error.message });
+//   }
+// };
+
 // TODO ------------>
 
 // export const getSellerById = async (req, res) => {}
-
-// export const updateSeller = async (req, res) => {}
 
 // export const getAllSellers = async (req, res) => {}
 
