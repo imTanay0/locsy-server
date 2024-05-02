@@ -10,11 +10,21 @@ const sendToken = (res, user, role, message, statusCode = 200) => {
 
   res.cookie("token", token, options);
 
+  const formatUser = {
+    _id: user._id,
+    fname: user.fname,
+    lname: user.lname,
+    email: user.email,
+    role: user.role,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+  };
+
   res.status(statusCode).json({
     success: true,
-    message,
-    user,
+    user: formatUser,
     role,
+    message,
   });
 };
 

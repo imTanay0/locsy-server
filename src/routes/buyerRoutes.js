@@ -6,6 +6,7 @@ import {
   loginBuyer,
   logoutBuyer,
   registerBuyer,
+  updateBuyer,
 } from "../controllers/buyerController.js";
 import { isAuthenticated } from "./../middlewares/auth.js";
 
@@ -21,5 +22,7 @@ router.get("/logout", isAuthenticated, logoutBuyer);
 router.get("/", isAuthenticated, getLoggedInBuyer);
 
 router.delete("/delete", isAuthenticated, deleteLoggedInBuyer);
+
+router.put("/update", isAuthenticated, updateBuyer);
 
 export default router;
