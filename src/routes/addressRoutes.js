@@ -11,6 +11,8 @@ const router = express.Router();
 
 router.post("/add", isAuthenticated, addAddress);
 
+
+
 router.get("/get", isAuthenticated, getAllAddressForBuyer);
 
 router.route("/:addressId").delete(isAuthenticated, removeAddress);
